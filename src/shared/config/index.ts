@@ -1,15 +1,22 @@
 import { IConfiguration } from "./configuration.interface"
 
-export const configuration = (): IConfiguration => ({
-    port: parseInt(process.env.PORT, 10),
-    "database.url": process.env.DB_URL,
-    clientOrigin: process.env.CLIENT_ORIGIN,
-    //youtube: {
-    //    apiKey: process.env.YT_API_KEY,
-    //    apiUrl: process.env.YT_API_URL,
-    //    embed: process.env.YT_EMBED,
-    //},
-    //secrets: {
-    //    jwt: process.env.JWT_SECRET,
-    //},
-})
+export const configuration = (): IConfiguration => {
+    const { PORT, DB_URL, CLIENT_ORIGIN, JWT_SECRET } = process.env
+    if (!(DB_URL && CLIENT_ORIGIN && JWT_SECRET)) {
+        const missingKeys = []
+        if (!DB_URL) missingKeys.push("DB_URL")
+        if (!CLIENT_ORIGIN) missingKeys.push("CLIENT_ORIGIN")
+        if (!JWT_SECRET) missingKeys.push("JWT_SECRET")
+        let message = missingKeys.join("\n")
+        message = "Env variables are missing: \n" + " - " + message
+
+        throw new Error(message)
+    }
+
+    return {
+        port: parseInt(PORT || "4000", 10),
+        database: { url: DB_URL },
+        clientOrigin: CLIENT_ORIGIN,
+        jwt: { secret: JWT_SECRET },
+    }
+}
