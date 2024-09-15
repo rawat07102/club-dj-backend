@@ -1,20 +1,21 @@
-import { User } from "@/shared/entities"
+import { CreateUserDto } from "@/auth/dtos/CreateUser.dto"
+import { Club, User } from "@/shared/entities"
+import { AuthUserPayload, FindAllOptions } from "@/shared/utils/types"
 
 export interface IUserService {
-    create(args: createUserDetails): Promise<User["id"]>
-    findAll(args: findAllOptions): Promise<User[]>
+    create(dto: CreateUserDto): Promise<User["id"]>
+    addClubToUserFollow(
+        id: User["id"],
+        clubId: Club["id"],
+        authUser: AuthUserPayload
+    ): Promise<void>
+    removeClubFromUserFollow(
+        id: User["id"],
+        clubId: Club["id"],
+        authUser: AuthUserPayload
+    ): Promise<void>
+    findAll(args: FindAllOptions): Promise<User[]>
     findByUsername(username: User["username"]): Promise<User>
     findById(id: User["id"]): Promise<User>
     delete(id: User["id"]): Promise<boolean>
-}
-
-export type createUserDetails = {
-    username: User["username"]
-    password: User["password"]
-    email: User["email"]
-}
-
-export type findAllOptions = {
-    start?: number
-    count?: number
 }

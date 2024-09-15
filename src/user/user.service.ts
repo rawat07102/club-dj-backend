@@ -1,29 +1,46 @@
 import { Injectable, InternalServerErrorException } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
-import { User } from "@/shared/entities"
+import { Club, User } from "@/shared/entities"
 import { Repository } from "typeorm"
-import {
-    createUserDetails,
-    findAllOptions,
-    IUserService,
-} from "./interfaces/IUserService.interface"
+import { IUserService } from "./interfaces/IUserService.interface"
 import * as bcrypt from "bcrypt"
+import { FindAllOptions } from "@/shared/utils/types"
+import { CreateUserDto } from "@/auth/dtos/CreateUser.dto"
 
 @Injectable()
 export class UserService implements IUserService {
     constructor(
         @InjectRepository(User)
-        private userRepository: Repository<User>
+        private userRepo: Repository<User>
     ) {}
+
+    addClubToUserFollow(id: User["id"], clubId: Club["id"]): Promise<void> {
+        return this.userRepo
+            .createQueryBuilder()
+            .relation(User, "clubsFollowed")
+            .of(id)
+            .add(clubId)
+    }
+
+    removeClubFromUserFollow(
+        id: User["id"],
+        clubId: Club["id"]
+    ): Promise<void> {
+        return this.userRepo
+            .createQueryBuilder()
+            .relation(User, "clubsFollowed")
+            .of(id)
+            .remove(clubId)
+    }
 
     async create({
         username,
         password,
         email,
-    }: createUserDetails): Promise<User["id"]> {
+    }: CreateUserDto): Promise<User["id"]> {
         try {
             const passwordHash = await bcrypt.hash(password, 10)
-            const user = this.userRepository.create({
+            const user = this.userRepo.create({
                 username,
                 password: passwordHash,
                 email,
@@ -35,15 +52,15 @@ export class UserService implements IUserService {
         }
     }
 
-    async findAll({ start = 0, count = 10 }: findAllOptions): Promise<User[]> {
-        return this.userRepository.find({
+    async findAll({ start = 0, count = 10 }: FindAllOptions): Promise<User[]> {
+        return this.userRepo.find({
             skip: start,
             take: count,
         })
     }
 
     async findByUsername(username: User["username"]): Promise<User> {
-        return this.userRepository.findOne({
+        return this.userRepo.findOne({
             where: {
                 username,
             },
@@ -51,7 +68,7 @@ export class UserService implements IUserService {
     }
 
     async findById(id: User["id"]): Promise<User> {
-        return this.userRepository.findOne({
+        return this.userRepo.findOne({
             where: {
                 id,
             },
@@ -59,7 +76,7 @@ export class UserService implements IUserService {
     }
 
     async delete(id: number) {
-        const user = await this.userRepository.findOneBy({ id })
+        const user = await this.userRepo.findOneBy({ id })
         await user.remove()
         return true
     }

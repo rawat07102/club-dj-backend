@@ -6,6 +6,8 @@ import { ConfigModule, ConfigService } from "@nestjs/config"
 import { IConfiguration } from "./shared/config/configuration.interface"
 import { AuthModule } from "./auth/auth.module"
 import { UserModule } from "./user/user.module"
+import { ClubsModule } from "./clubs/clubs.module"
+import { entities } from "./shared/entities"
 
 @Module({
     imports: [
@@ -19,8 +21,7 @@ import { UserModule } from "./user/user.module"
             ) => ({
                 type: "postgres",
                 url: configService.get("database.url", { infer: true }),
-                entities: [User],
-                synchronize: true,
+                entities: entities,
                 logging: true,
             }),
             inject: [ConfigService],
@@ -28,6 +29,7 @@ import { UserModule } from "./user/user.module"
         TypeOrmModule.forFeature([User]),
         AuthModule,
         UserModule,
+        ClubsModule,
     ],
 })
 export class AppModule {}

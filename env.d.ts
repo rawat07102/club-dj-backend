@@ -3,6 +3,7 @@ namespace NodeJS {
   export interface ProcessEnv {
     PORT?: string;
     DB_URL?: string;
+    BASE_URL?: string;
     //DB_DATABASE?: string;
     // DB_HOST?: string;
     // DB_USERNAME?: string;

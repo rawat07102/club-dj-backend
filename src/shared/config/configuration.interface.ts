@@ -7,6 +7,7 @@ export interface IConfiguration {
     jwt: {
         secret: string
     }
+    baseUrl: string
     //"youtube.apiKey": string
     //"youtube.apiUrl": string
     //"youtube.embed": string

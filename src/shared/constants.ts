@@ -6,7 +6,7 @@ export enum Gateways {
 export enum Services {
     AUTH_SERVICE = "AUTH_SERVICE",
     APP_SERVICE = "APP_SERVICE",
-    ROOM_SERVICE = "ROOM_SERVICE",
+    CLUB_SERVICE = "CLUB_SERVICE",
     USER_SERVICE = "USER_SERVICE",
     YOUTUBE_SERVICE = "YOUTUBE_SERVICE",
     PLAYLISTS_SERVICE = "PLAYLISTS_SERVICE",
@@ -15,4 +15,5 @@ export enum Services {
 export enum Routes {
     AUTH = "auth",
     USERS = "users",
+    CLUBS = "clubs",
 }

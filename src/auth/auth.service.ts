@@ -23,18 +23,15 @@ export class AuthService implements IAuthService {
         return isValid ? user : null
     }
 
-    async createToken(id: number, username: string) {
-        return this.jwtService.signAsync({
-            id,
-            username,
-        })
+    async createToken(payload: AuthUserPayload) {
+        return this.jwtService.signAsync(payload)
     }
 
-    async validateToken(token: string) {
+    async verifyToken(token: string) {
         return this.jwtService.verifyAsync(token)
     }
 
-    async decodeToken(token: string) {
+    async getUserByAuthToken(token: string) {
         const payload = this.jwtService.decode(token) as AuthUserPayload
         const user = await this.userService.findById(payload.id)
         return user

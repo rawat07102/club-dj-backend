@@ -1,9 +1,14 @@
-import { instanceToPlain } from "class-transformer";
-import { BaseEntity, CreateDateColumn, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { instanceToPlain } from "class-transformer"
+import {
+    BaseEntity,
+    CreateDateColumn,
+    PrimaryGeneratedColumn,
+    UpdateDateColumn,
+} from "typeorm"
 
 export class AbstractEntity extends BaseEntity {
     @PrimaryGeneratedColumn()
-    id: number;
+    id: number
 
     @CreateDateColumn()
     created: Date

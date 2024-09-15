@@ -1,11 +1,9 @@
 import { User } from "@/shared/entities"
+import { AuthUserPayload } from "@/shared/utils/types"
 
 export interface IAuthService {
-    validateUser(
-        username: string,
-        password: string
-    ): Promise<User | null>
-    createToken(id: number, username: string): Promise<string>
-    validateToken(token: string): Promise<boolean>
-    decodeToken(token: string): Promise<any>
+    validateUser(username: string, password: string): Promise<User | null>
+    createToken(payload: AuthUserPayload): Promise<string>
+    verifyToken(token: string): Promise<boolean>
+    getUserByAuthToken(token: string): Promise<any>
 }

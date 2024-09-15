@@ -1,6 +1,7 @@
-import { Column } from "typeorm";
-import { AbstractEntity } from "./Abstract.entity";
-import { User } from "./User.entity";
+import { Column, ManyToOne } from "typeorm"
+import { AbstractEntity } from "./Abstract.entity"
+import { User } from "./User.entity"
+import { Club } from "./Club.entity"
 
 export class Playlist extends AbstractEntity {
     @Column()
@@ -12,6 +13,9 @@ export class Playlist extends AbstractEntity {
     @Column()
     likeCount: number
 
-    @Column()
-    modifier: User["id"] | "club"
+    @ManyToOne(() => User, user => user.playlists)
+    creator: User
+
+    @ManyToOne(() => Club, club => club.playlists)
+    club: Club
 }

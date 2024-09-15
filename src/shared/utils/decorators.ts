@@ -6,9 +6,11 @@ export const AuthenticatedUser = createParamDecorator(
         //const type = context.getType()
         //if (type === "http") return getUserHttp(context)
         //return getUserWs(context)
-        const request: AuthenticatedRequest = context.switchToHttp().getRequest()
+        const request: AuthenticatedRequest = context
+            .switchToHttp()
+            .getRequest()
         return request.user
-    },
+    }
 )
 //
 //const getUserHttp = (context: ExecutionContext) => {

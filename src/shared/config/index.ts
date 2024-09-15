@@ -1,7 +1,7 @@
 import { IConfiguration } from "./configuration.interface"
 
 export const configuration = (): IConfiguration => {
-    const { PORT, DB_URL, CLIENT_ORIGIN, JWT_SECRET } = process.env
+    const { PORT, DB_URL, CLIENT_ORIGIN, JWT_SECRET, BASE_URL } = process.env
     if (!(DB_URL && CLIENT_ORIGIN && JWT_SECRET)) {
         const missingKeys = []
         if (!DB_URL) missingKeys.push("DB_URL")
@@ -18,5 +18,6 @@ export const configuration = (): IConfiguration => {
         database: { url: DB_URL },
         clientOrigin: CLIENT_ORIGIN,
         jwt: { secret: JWT_SECRET },
+        baseUrl: BASE_URL
     }
 }
