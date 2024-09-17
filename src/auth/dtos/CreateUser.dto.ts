@@ -3,7 +3,7 @@ import { IsEmail, IsNotEmpty, Length } from "class-validator"
 
 export class CreateUserDto {
     @IsNotEmpty()
-    @Length(4, 32)
+    @Length(4, 24)
     username: User["username"]
 
     @IsNotEmpty()

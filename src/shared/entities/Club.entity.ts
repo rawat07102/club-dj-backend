@@ -12,21 +12,23 @@ import { Playlist } from "./Playlist.entity"
 
 @Entity()
 export class Club extends AbstractEntity {
-    @Column()
+    @Column({
+        unique: true,
+    })
     name: string
 
     @Column({
         default: "",
     })
-    description?: string
+    description: string
 
-    @Column("simple-array", { default: [] })
+    @Column("simple-array")
     queue: string[]
 
     @OneToOne(() => User, { nullable: true })
     currentDJ: User | null
 
-    @OneToMany(() => User, (user) => user.joinedWishlist)
+    @OneToMany(() => User, (user) => user.wishlistJoined)
     djWishlist: User[]
 
     @ManyToOne(() => User, (creator) => creator.clubs, { nullable: false })

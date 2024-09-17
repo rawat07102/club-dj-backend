@@ -1,10 +1,4 @@
-import {
-    Controller,
-    Post,
-    Get,
-    UseGuards,
-    Inject,
-} from "@nestjs/common"
+import { Controller, Post, Get, UseGuards, Inject } from "@nestjs/common"
 import { Routes, Services } from "@/shared/constants"
 import { IAuthService } from "./interfaces/IAuthService.interface"
 import { JwtAuthGuard, LocalAuthGuard } from "./utils/guards"
@@ -15,7 +9,7 @@ import { AuthenticatedRequest } from "@/shared/utils/interface"
 export class AuthController {
     constructor(
         @Inject(Services.AUTH_SERVICE)
-        private readonly authService: IAuthService,
+        private readonly authService: IAuthService
     ) {}
 
     @UseGuards(LocalAuthGuard)

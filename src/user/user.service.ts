@@ -52,10 +52,10 @@ export class UserService implements IUserService {
         }
     }
 
-    async findAll({ start = 0, count = 10 }: FindAllOptions): Promise<User[]> {
+    async findAll({ skip = 0, take = 10 }: FindAllOptions): Promise<User[]> {
         return this.userRepo.find({
-            skip: start,
-            take: count,
+            skip,
+            take,
         })
     }
 

@@ -5,27 +5,51 @@ import {
     Delete,
     Get,
     Inject,
-    NotImplementedException,
     Param,
     ParseIntPipe,
     Patch,
     Post,
     Query,
+    UnauthorizedException,
     UseGuards,
 } from "@nestjs/common"
-import { ClubsService } from "./clubs.service"
 import { PostClubDto } from "./dtos/PostClub.dto"
 import { JwtAuthGuard } from "@/auth/utils/guards"
 import { AuthenticatedUser } from "@/shared/utils/decorators"
 import { AuthUserPayload } from "@/shared/utils/types"
 import { PatchClubDto } from "./dtos/PatchClub.dto"
+import { IClubService } from "./interfaces/IClubService.interface"
+import { IPlaylistService } from "@/playlists/interfaces/IPlaylistService.interface"
+import { CreatePlaylistDto } from "@/playlists/dtos/create-playlist.dto"
 
 @Controller(Routes.CLUBS)
 export class ClubsController {
     constructor(
         @Inject(Services.CLUB_SERVICE)
-        private readonly clubService: ClubsService
+        private readonly clubService: IClubService,
+
+        @Inject(Services.PLAYLISTS_SERVICE)
+        private readonly playlistService: IPlaylistService
     ) {}
+
+    @UseGuards(JwtAuthGuard)
+    @Post(":clubId/playlists")
+    async createNewPlaylist(
+        @Param("clubId", ParseIntPipe) clubId: number,
+        @AuthenticatedUser() authUser: AuthUserPayload,
+        @Body() dto: CreatePlaylistDto
+    ) {
+        if (!this.clubService.isCreator(clubId, authUser.id)) {
+            throw new UnauthorizedException()
+        }
+
+        const newPlaylist = await this.playlistService.create(dto, authUser)
+        const club = await this.clubService.findById(clubId)
+        newPlaylist.club = club
+        await newPlaylist.save()
+        return newPlaylist
+    }
+
 
     @Post()
     @UseGuards(JwtAuthGuard)
@@ -38,12 +62,12 @@ export class ClubsController {
 
     @Get()
     async getAllClubs(
-        @Query("start") start: number,
-        @Query("count") count: number
+        @Query("skip") skip: number,
+        @Query("take") take: number
     ) {
         return this.clubService.findAll({
-            start,
-            count,
+            skip,
+            take,
         })
     }
 
@@ -52,20 +76,22 @@ export class ClubsController {
         return this.clubService.findById(clubId)
     }
 
+    @UseGuards(JwtAuthGuard)
     @Patch(":clubId")
-    async updateClub(
+    async updateClubDetails(
         @Param("clubId", ParseIntPipe) clubId: number,
-        @Body() dto: PatchClubDto
+        @Body() dto: PatchClubDto,
+        @AuthenticatedUser() authUser: AuthUserPayload
     ) {
-        const { name, description, queue, currentDJ, playlists } = dto
-        const updateData = {}
-        if (name) {
-            updateData["name"] = name
-        }
+        return this.clubService.updateClubDetails(clubId, dto, authUser)
     }
 
+    @UseGuards(JwtAuthGuard)
     @Delete(":clubId")
-    async delete(@Param("clubId", ParseIntPipe) clubId: number) {
-        return this.clubService.delete(clubId)
+    async delete(
+        @Param("clubId", ParseIntPipe) clubId: number,
+        @AuthenticatedUser() authUser: AuthUserPayload
+    ) {
+        return this.clubService.delete(clubId, authUser)
     }
 }

@@ -16,4 +16,5 @@ export enum Routes {
     AUTH = "auth",
     USERS = "users",
     CLUBS = "clubs",
+    PLAYLISTS = "playlists",
 }

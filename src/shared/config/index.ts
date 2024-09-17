@@ -18,6 +18,6 @@ export const configuration = (): IConfiguration => {
         database: { url: DB_URL },
         clientOrigin: CLIENT_ORIGIN,
         jwt: { secret: JWT_SECRET },
-        baseUrl: BASE_URL
+        baseUrl: BASE_URL,
     }
 }

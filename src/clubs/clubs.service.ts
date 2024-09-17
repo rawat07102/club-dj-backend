@@ -1,9 +1,4 @@
-import {
-    Inject,
-    Injectable,
-    NotFoundException,
-    UnauthorizedException,
-} from "@nestjs/common"
+import { Inject, Injectable, UnauthorizedException } from "@nestjs/common"
 import { IClubService } from "./interfaces/IClubService.interface"
 import { Club, User } from "@/shared/entities"
 import { AuthUserPayload, FindAllOptions } from "@/shared/utils/types"
@@ -12,6 +7,7 @@ import { InjectRepository } from "@nestjs/typeorm"
 import { Repository } from "typeorm"
 import { IUserService } from "@/user/interfaces/IUserService.interface"
 import { Services } from "@/shared/constants"
+import { PatchClubDto } from "./dtos/PatchClub.dto"
 
 @Injectable()
 export class ClubsService implements IClubService {
@@ -127,17 +123,23 @@ export class ClubsService implements IClubService {
         const newClub = this.clubRepo.create(clubDto)
         const user = await this.userService.findById(authUser.id)
         if (!user) {
-            throw new NotFoundException("User Not Found")
+            throw new UnauthorizedException("User not found with given ID")
         }
-        newClub
+        newClub.creator = user
+        if (!user.clubs) {
+            user.clubs = [newClub]
+        } else {
+            user.clubs.push(newClub)
+        }
+        await user.save()
         await newClub.save()
         return newClub.id
     }
 
-    async findAll({ start = 0, count = 10 }: FindAllOptions): Promise<Club[]> {
+    async findAll({ skip = 0, take = 10 }: FindAllOptions): Promise<Club[]> {
         return this.clubRepo.find({
-            skip: start,
-            take: count,
+            skip,
+            take,
         })
     }
 
@@ -149,5 +151,45 @@ export class ClubsService implements IClubService {
         const club = await this.clubRepo.findOneBy({ id })
         await club.remove()
         return true
+    }
+
+    async updateClubDetails(
+        id: Club["id"],
+        dto: PatchClubDto,
+        authUser: AuthUserPayload
+    ): Promise<Club> {
+        const { name, description } = dto
+        const club = await this.clubRepo.findOne({
+            relations: {
+                creator: true,
+            },
+            where: {
+                id,
+            },
+        })
+        if (!club || club.creator.id !== authUser.id) {
+            throw new UnauthorizedException("User is not authorized")
+        }
+        if (name) {
+            club.name = name
+        }
+        if (description) {
+            club.description = description
+        }
+        await club.save()
+        return club
+    }
+
+    async isCreator(clubId: Club["id"], userId: User["id"]): Promise<boolean> {
+        const club = await this.clubRepo.findOne({
+            where: {
+                id: clubId,
+            },
+            relations: {
+                creator: true,
+            },
+        })
+
+        return club.creator.id === userId
     }
 }

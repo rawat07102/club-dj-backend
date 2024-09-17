@@ -10,10 +10,14 @@ import {
     Body,
     NotImplementedException,
     Patch,
+    UseGuards,
 } from "@nestjs/common"
 import { Routes, Services } from "@/shared/constants"
 import { IUserService } from "./interfaces/IUserService.interface"
 import { CreateUserDto } from "@/auth/dtos/CreateUser.dto"
+import { JwtAuthGuard } from "@/auth/utils/guards"
+import { AuthenticatedUser } from "@/shared/utils/decorators"
+import { AuthUserPayload } from "@/shared/utils/types"
 
 @Controller(Routes.USERS)
 export class UserController {
@@ -24,10 +28,10 @@ export class UserController {
 
     @Get()
     async getAllUsers(
-        @Query("start") start: number,
-        @Query("count") count: number
+        @Query("skip") skip: number,
+        @Query("take") take: number
     ) {
-        return this.userService.findAll({ start, count })
+        return this.userService.findAll({ skip, take })
     }
 
     @Post()
@@ -40,13 +44,21 @@ export class UserController {
         return this.userService.findById(userId)
     }
 
+    @UseGuards(JwtAuthGuard)
     @Patch(":userId")
-    async updateUser(@Param("userId", ParseIntPipe) userId: number) {
+    async updateUser(
+        @Param("userId", ParseIntPipe) userId: number,
+        @AuthenticatedUser() authUser: AuthUserPayload
+    ) {
         return new NotImplementedException("PATCH /users/:userId")
     }
 
+    @UseGuards(JwtAuthGuard)
     @Delete(":userId")
-    async delete(@Param("userId", ParseIntPipe) userId: number) {
+    async delete(
+        @Param("userId", ParseIntPipe) userId: number,
+        @AuthenticatedUser() authUser: AuthUserPayload
+    ) {
         return this.userService.delete(userId)
     }
 }

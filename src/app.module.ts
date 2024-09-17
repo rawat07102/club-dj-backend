@@ -1,6 +1,5 @@
 import { Module } from "@nestjs/common"
 import { TypeOrmModule } from "@nestjs/typeorm"
-import { User } from "@/shared/entities/User.entity"
 import { configuration } from "./shared/config"
 import { ConfigModule, ConfigService } from "@nestjs/config"
 import { IConfiguration } from "./shared/config/configuration.interface"
@@ -8,6 +7,7 @@ import { AuthModule } from "./auth/auth.module"
 import { UserModule } from "./user/user.module"
 import { ClubsModule } from "./clubs/clubs.module"
 import { entities } from "./shared/entities"
+import { PlaylistsModule } from "./playlists/playlists.module"
 
 @Module({
     imports: [
@@ -23,13 +23,14 @@ import { entities } from "./shared/entities"
                 url: configService.get("database.url", { infer: true }),
                 entities: entities,
                 logging: true,
+                synchronize: true,
             }),
             inject: [ConfigService],
         }),
-        TypeOrmModule.forFeature([User]),
         AuthModule,
         UserModule,
         ClubsModule,
+        PlaylistsModule,
     ],
 })
 export class AppModule {}
