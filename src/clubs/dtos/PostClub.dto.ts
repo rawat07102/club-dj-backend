@@ -1,12 +1,7 @@
 import { Club } from "@/shared/entities"
-import { IsNotEmpty, IsOptional, Length, MaxLength } from "class-validator"
+import { PickType } from "@nestjs/mapped-types"
 
-export class PostClubDto {
-    @Length(6, 32)
-    @IsNotEmpty()
-    name: Club["name"]
-
-    @MaxLength(255)
-    @IsOptional()
-    description?: Club["description"]
-}
+export class PostClubDto extends PickType(Club, [
+    "name",
+    "description",
+] as const) {}

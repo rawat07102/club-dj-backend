@@ -9,7 +9,7 @@ export interface IClubService {
         dto: PatchClubDto,
         authUser: AuthUserPayload
     ): Promise<Club>
-    create(clubDto: PostClubDto, authUser: AuthUserPayload): Promise<Club["id"]>
+    create(clubDto: PostClubDto, authUser: AuthUserPayload): Promise<Club>
     addVideoToQueue(
         id: Club["id"],
         videoId: string,

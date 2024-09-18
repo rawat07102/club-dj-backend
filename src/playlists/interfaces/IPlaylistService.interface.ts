@@ -1,4 +1,4 @@
-import { Playlist } from "@/shared/entities"
+import { Playlist, User } from "@/shared/entities"
 import { CreatePlaylistDto } from "../dtos/create-playlist.dto"
 import { AuthUserPayload } from "@/shared/utils/types"
 

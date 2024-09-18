@@ -5,14 +5,16 @@ import { Services } from "@/shared/constants"
 import { TypeOrmModule } from "@nestjs/typeorm"
 import { Club } from "@/shared/entities"
 import { UserModule } from "@/user/user.module"
+import { PlaylistsModule } from "@/playlists/playlists.module"
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Club]), UserModule],
+    imports: [TypeOrmModule.forFeature([Club]), UserModule, PlaylistsModule],
     providers: [
         {
             useClass: ClubsService,
             provide: Services.CLUB_SERVICE,
         },
+
     ],
     controllers: [ClubsController],
 })

@@ -32,6 +32,32 @@ export class ClubsController {
         private readonly playlistService: IPlaylistService
     ) {}
 
+    @Get()
+    async getAllClubs(
+        @Query("skip") skip: number,
+        @Query("take") take: number
+    ) {
+        return this.clubService.findAll({
+            skip,
+            take,
+        })
+    }
+
+    @Get(":clubId")
+    async getById(@Param("clubId", ParseIntPipe) clubId: number) {
+        return this.clubService.findById(clubId)
+    }
+
+    @Post()
+    @UseGuards(JwtAuthGuard)
+    async create(
+        @Body() dto: PostClubDto,
+        @AuthenticatedUser() authUser: AuthUserPayload
+    ) {
+        return this.clubService.create(dto, authUser)
+    }
+
+
     @UseGuards(JwtAuthGuard)
     @Post(":clubId/playlists")
     async createNewPlaylist(
@@ -48,32 +74,6 @@ export class ClubsController {
         newPlaylist.club = club
         await newPlaylist.save()
         return newPlaylist
-    }
-
-
-    @Post()
-    @UseGuards(JwtAuthGuard)
-    async create(
-        @Body() createClubDto: PostClubDto,
-        @AuthenticatedUser() authUser: AuthUserPayload
-    ) {
-        return this.clubService.create(createClubDto, authUser)
-    }
-
-    @Get()
-    async getAllClubs(
-        @Query("skip") skip: number,
-        @Query("take") take: number
-    ) {
-        return this.clubService.findAll({
-            skip,
-            take,
-        })
-    }
-
-    @Get(":clubId")
-    async getById(@Param("clubId", ParseIntPipe) clubId: number) {
-        return this.clubService.findById(clubId)
     }
 
     @UseGuards(JwtAuthGuard)

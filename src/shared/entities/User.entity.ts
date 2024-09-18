@@ -1,6 +1,7 @@
 import {
     Column,
     Entity,
+    JoinColumn,
     JoinTable,
     ManyToMany,
     ManyToOne,
@@ -38,16 +39,21 @@ export class User extends AbstractEntity {
     stars: number
 
     @ManyToMany(() => User, (user) => user.friends)
+    @JoinTable()
     friends: User[]
 
     @OneToMany(() => Playlist, (playlist) => playlist.creator)
+    @JoinColumn()
     playlists: Playlist[]
 
     @JoinTable()
     @ManyToMany(() => Playlist, (playlist) => playlist.sharedWith)
     sharedPlaylists: Playlist[]
 
-    @OneToMany(() => Club, (club) => club.creator)
+    @OneToMany(() => Club, (club) => club.creator, {
+        cascade: ["insert"]
+    })
+    @JoinColumn()
     clubs: Club[]
 
     @ManyToOne(() => Club, (club) => club.djWishlist)

@@ -119,21 +119,12 @@ export class ClubsService implements IClubService {
     async create(
         clubDto: PostClubDto,
         authUser: AuthUserPayload
-    ): Promise<Club["id"]> {
+    ): Promise<Club> {
         const newClub = this.clubRepo.create(clubDto)
         const user = await this.userService.findById(authUser.id)
-        if (!user) {
-            throw new UnauthorizedException("User not found with given ID")
-        }
-        newClub.creator = user
-        if (!user.clubs) {
-            user.clubs = [newClub]
-        } else {
-            user.clubs.push(newClub)
-        }
+        user.clubs.push(newClub)
         await user.save()
-        await newClub.save()
-        return newClub.id
+        return newClub
     }
 
     async findAll({ skip = 0, take = 10 }: FindAllOptions): Promise<Club[]> {
@@ -144,7 +135,18 @@ export class ClubsService implements IClubService {
     }
 
     async findById(id: Club["id"]): Promise<Club> {
-        return this.clubRepo.findOneBy({ id })
+        return this.clubRepo.findOne({
+            where: {
+                id,
+            },
+            relations: {
+                creator: true,
+                currentDJ: true,
+                followers: true,
+                playlists: true,
+                djWishlist: true,
+            },
+        })
     }
 
     async delete(id: Club["id"]): Promise<boolean> {

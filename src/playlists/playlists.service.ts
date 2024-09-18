@@ -7,7 +7,6 @@ import { CreatePlaylistDto } from "./dtos/create-playlist.dto"
 import { Services } from "@/shared/constants"
 import { IUserService } from "@/user/interfaces/IUserService.interface"
 import { AuthUserPayload } from "@/shared/utils/types"
-import { IClubService } from "@/clubs/interfaces/IClubService.interface"
 
 @Injectable()
 export class PlaylistsService implements IPlaylistService {
@@ -17,10 +16,10 @@ export class PlaylistsService implements IPlaylistService {
 
         @Inject(Services.USER_SERVICE)
         private readonly userService: IUserService,
-
-        @Inject(Services.CLUB_SERVICE)
-        private readonly clubService: IClubService,
     ) {}
+    searchUsersPlaylsits(userId: User["id"], playlistId: Playlist["id"]): Promise<Playlist> {
+        throw new Error("Method not implemented.")
+    }
 
     async create(
         dto: CreatePlaylistDto,
@@ -41,4 +40,5 @@ export class PlaylistsService implements IPlaylistService {
     async findById(id: Playlist["id"]): Promise<Playlist> {
         return this.playlistRepo.findOneBy({ id })
     }
+
 }

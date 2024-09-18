@@ -5,6 +5,8 @@ import {
     OneToMany,
     OneToOne,
     ManyToMany,
+    JoinColumn,
+    JoinTable,
 } from "typeorm"
 import { AbstractEntity } from "./Abstract.entity"
 import { User } from "./User.entity"
@@ -22,21 +24,28 @@ export class Club extends AbstractEntity {
     })
     description: string
 
-    @Column("simple-array")
+    @Column("simple-array", { nullable: true })
     queue: string[]
 
     @OneToOne(() => User, { nullable: true })
-    currentDJ: User | null
+    @JoinColumn()
+    currentDJ: User
 
     @OneToMany(() => User, (user) => user.wishlistJoined)
+    @JoinColumn()
     djWishlist: User[]
 
-    @ManyToOne(() => User, (creator) => creator.clubs, { nullable: false })
+    @Column({ nullable: true })
+    creatorId: number
+
+    @ManyToOne(() => User, (creator) => creator.clubs)
     creator: User
 
     @ManyToMany(() => User, (user) => user.clubsFollowed)
+    @JoinTable()
     followers: User[]
 
     @OneToMany(() => Playlist, (playlist) => playlist.club)
+    @JoinColumn()
     playlists: Playlist[]
 }
