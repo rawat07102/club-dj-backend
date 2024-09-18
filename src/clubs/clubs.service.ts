@@ -44,32 +44,43 @@ export class ClubsService implements IClubService {
         id: Club["id"],
         videoId: string,
         authUser: AuthUserPayload
-    ): Promise<Club["queue"]> {
-        const club = await this.clubRepo.findOneByOrFail({ id })
-        if (club.creator.id !== authUser.id) {
+    ): Promise<Club> {
+        const club = await this.clubRepo.findOne({
+            where: { id },
+        })
+
+        if (club.creatorId !== authUser.id) {
             throw new UnauthorizedException(
                 "Only club owner can make changes to the queue."
             )
         }
-        club.queue.push(videoId)
+
+        if (club.queue) {
+            club.queue.push(videoId)
+        } else {
+            club.queue = [videoId]
+        }
+
         await club.save()
-        return club.queue
+        return club
     }
 
     async removeVideoFromQueue(
         id: Club["id"],
         videoId: string,
         authUser: AuthUserPayload
-    ): Promise<Club["queue"]> {
-        const club = await this.clubRepo.findOneByOrFail({ id })
-        if (club.creator.id !== authUser.id) {
+    ): Promise<Club> {
+        const club = await this.clubRepo.findOne({
+            where: { id },
+        })
+        if (club.creatorId !== authUser.id) {
             throw new UnauthorizedException(
                 "Only club owner can make changes to the queue."
             )
         }
         club.queue = club.queue.filter((id) => id !== videoId)
         await club.save()
-        return club.queue
+        return club
     }
 
     async addUserToDjWishlist(

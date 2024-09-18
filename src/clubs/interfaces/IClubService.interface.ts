@@ -14,12 +14,12 @@ export interface IClubService {
         id: Club["id"],
         videoId: string,
         authUser: AuthUserPayload
-    ): Promise<Club["queue"]>
+    ): Promise<Club>
     removeVideoFromQueue(
         id: Club["id"],
         videoId: string,
         authUser: AuthUserPayload
-    ): Promise<Club["queue"]>
+    ): Promise<Club>
     addUserToDjWishlist(
         id: Club["id"],
         userId: User["id"],

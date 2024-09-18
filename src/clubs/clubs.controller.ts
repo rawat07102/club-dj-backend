@@ -9,6 +9,7 @@ import {
     ParseIntPipe,
     Patch,
     Post,
+    Put,
     Query,
     UnauthorizedException,
     UseGuards,
@@ -57,6 +58,53 @@ export class ClubsController {
         return this.clubService.create(dto, authUser)
     }
 
+    @Put(":clubId/queue")
+    @UseGuards(JwtAuthGuard)
+    async putVideoToQueue(
+        @Param("clubId", ParseIntPipe) clubId: number,
+        @Body("videoId") videoId: string,
+        @AuthenticatedUser() authUser: AuthUserPayload
+    ) {
+        return this.clubService.addVideoToQueue(clubId, videoId, authUser)
+    }
+
+    @Delete(":clubId/queue")
+    @UseGuards(JwtAuthGuard)
+    async deleteVideoFromQueue(
+        @Param("clubId", ParseIntPipe) clubId: number,
+        @Body("videoId") videoId: string,
+        @AuthenticatedUser() authUser: AuthUserPayload
+    ) {
+        return this.clubService.removeVideoFromQueue(clubId, videoId, authUser)
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Patch(":clubId")
+    async updateClubDetails(
+        @Param("clubId", ParseIntPipe) clubId: number,
+        @Body() dto: PatchClubDto,
+        @AuthenticatedUser() authUser: AuthUserPayload
+    ) {
+        return this.clubService.updateClubDetails(clubId, dto, authUser)
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Put(":clubId/followers")
+    async addUserToClubFollowers(
+        @Param("clubId", ParseIntPipe) clubId: number,
+        @AuthenticatedUser() authUser: AuthUserPayload
+    ) {
+        return this.clubService.addUserToClubFollowers(clubId, authUser.id)
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Delete(":clubId/followers")
+    async removeUserFromClubFollowers(
+        @Param("clubId", ParseIntPipe) clubId: number,
+        @AuthenticatedUser() authUser: AuthUserPayload
+    ) {
+        return this.clubService.removeUserFromClubFollowers(clubId, authUser.id)
+    }
 
     @UseGuards(JwtAuthGuard)
     @Post(":clubId/playlists")
@@ -74,16 +122,6 @@ export class ClubsController {
         newPlaylist.club = club
         await newPlaylist.save()
         return newPlaylist
-    }
-
-    @UseGuards(JwtAuthGuard)
-    @Patch(":clubId")
-    async updateClubDetails(
-        @Param("clubId", ParseIntPipe) clubId: number,
-        @Body() dto: PatchClubDto,
-        @AuthenticatedUser() authUser: AuthUserPayload
-    ) {
-        return this.clubService.updateClubDetails(clubId, dto, authUser)
     }
 
     @UseGuards(JwtAuthGuard)
