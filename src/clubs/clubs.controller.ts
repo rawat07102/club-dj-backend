@@ -12,7 +12,9 @@ import {
     Put,
     Query,
     UnauthorizedException,
+    UploadedFile,
     UseGuards,
+    UseInterceptors,
 } from "@nestjs/common"
 import { PostClubDto } from "./dtos/PostClub.dto"
 import { JwtAuthGuard } from "@/auth/utils/guards"
@@ -22,6 +24,7 @@ import { PatchClubDto } from "./dtos/PatchClub.dto"
 import { IClubService } from "./interfaces/IClubService.interface"
 import { IPlaylistService } from "@/playlists/interfaces/IPlaylistService.interface"
 import { CreatePlaylistDto } from "@/playlists/dtos/create-playlist.dto"
+import { FileInterceptor } from "@nestjs/platform-express"
 
 @Controller(Routes.CLUBS)
 export class ClubsController {
@@ -57,6 +60,28 @@ export class ClubsController {
     ) {
         return this.clubService.create(dto, authUser)
     }
+
+    @Put(":clubId/thumbnail")
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(FileInterceptor("file"))
+    async uploadClubThumbnail(
+        @Param("clubId", ParseIntPipe) clubId: number,
+        @UploadedFile() file: Express.Multer.File,
+        @AuthenticatedUser() authUser: AuthUserPayload
+    ) {
+        return this.clubService.changeClubThumbnail(clubId, file, authUser)
+    }
+
+    @Delete(":clubId/thumbnail")
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(FileInterceptor("file"))
+    async deleteThumbnail(
+        @Param("clubId", ParseIntPipe) clubId: number,
+        @AuthenticatedUser() authUser: AuthUserPayload
+    ) {
+        return this.clubService.deleteClubThumbnail(clubId, authUser)
+    }
+
 
     @Put(":clubId/queue")
     @UseGuards(JwtAuthGuard)

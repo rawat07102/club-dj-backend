@@ -25,7 +25,7 @@ export class User extends AbstractEntity {
     bio: string
 
     @Column({nullable: true})
-    imageUrl?: string
+    profilePic?: string
 
     @Column()
     email: string

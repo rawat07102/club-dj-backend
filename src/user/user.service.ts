@@ -12,6 +12,7 @@ import * as bcrypt from "bcrypt"
 import { AuthUserPayload, Buckets, FindAllOptions } from "@/shared/utils/types"
 import { CreateUserDto } from "@/auth/dtos/CreateUser.dto"
 import { ImagesService } from "@/images.service"
+import * as path from "path"
 
 @Injectable()
 export class UserService implements IUserService {
@@ -22,28 +23,31 @@ export class UserService implements IUserService {
         private imageService: ImagesService
     ) {}
 
+    private createFileName(id: User["id"], fileExtension: string) {
+        return `${id}-profile-pic${fileExtension}`
+    }
+
     async changeProfilePic(
         file: Express.Multer.File,
         authUser: AuthUserPayload
-    ): Promise<User["imageUrl"]> {
+    ): Promise<User["profilePic"]> {
         const user = await this.userRepo.findOneBy({ id: authUser.id })
         if (!user) {
             throw new BadRequestException("User not found")
         }
 
-        // TODO: delete old profile pic
-        if (user.imageUrl) {
-            await this.imageService.deleteFile(user.imageUrl)
+        if (user.profilePic) {
+            await this.imageService.deleteFile(user.profilePic)
         }
 
         const imageUrl = await this.imageService.uploadFile(
             file,
             Buckets.USERS,
-            authUser
+            this.createFileName(user.id, path.extname(file.originalname))
         )
-        user.imageUrl = imageUrl
+        user.profilePic = imageUrl
         await user.save()
-        return user.imageUrl
+        return user.profilePic
     }
 
     async deleteProfilePic(id: User["id"]) {
@@ -52,12 +56,12 @@ export class UserService implements IUserService {
             throw new BadRequestException("User not found")
         }
 
-        if (!user.imageUrl) {
+        if (!user.profilePic) {
             return
         }
 
-        await this.imageService.deleteFile(user.imageUrl)
-        user.imageUrl = null
+        await this.imageService.deleteFile(user.profilePic)
+        user.profilePic = null
         await user.save()
     }
 

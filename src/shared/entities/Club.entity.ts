@@ -25,7 +25,7 @@ export class Club extends AbstractEntity {
     description: string
 
     @Column({nullable: true})
-    imageUrl?: string
+    thumbnail?: string
 
     @Column("simple-array", { nullable: true })
     queue: string[]

@@ -9,6 +9,15 @@ export interface IClubService {
         dto: PatchClubDto,
         authUser: AuthUserPayload
     ): Promise<Club>
+    changeClubThumbnail(
+        id: Club["id"],
+        file: Express.Multer.File,
+        authUser: AuthUserPayload,
+    ): Promise<Club["thumbnail"]>
+    deleteClubThumbnail(
+        id: Club["id"],
+        authUser: AuthUserPayload,
+    ): Promise<void>
     create(clubDto: PostClubDto, authUser: AuthUserPayload): Promise<Club>
     addVideoToQueue(
         id: Club["id"],

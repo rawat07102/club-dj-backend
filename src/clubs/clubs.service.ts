@@ -1,13 +1,15 @@
-import { Inject, Injectable, UnauthorizedException } from "@nestjs/common"
+import { BadRequestException, Inject, Injectable, UnauthorizedException } from "@nestjs/common"
 import { IClubService } from "./interfaces/IClubService.interface"
 import { Club, User } from "@/shared/entities"
-import { AuthUserPayload, FindAllOptions } from "@/shared/utils/types"
+import { AuthUserPayload, Buckets, FindAllOptions } from "@/shared/utils/types"
 import { PostClubDto } from "./dtos/PostClub.dto"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository } from "typeorm"
 import { IUserService } from "@/user/interfaces/IUserService.interface"
 import { Services } from "@/shared/constants"
 import { PatchClubDto } from "./dtos/PatchClub.dto"
+import { ImagesService } from "@/images.service"
+import * as path from "path"
 
 @Injectable()
 export class ClubsService implements IClubService {
@@ -15,8 +17,54 @@ export class ClubsService implements IClubService {
         @InjectRepository(Club)
         private clubRepo: Repository<Club>,
         @Inject(Services.USER_SERVICE)
-        private userService: IUserService
+        private userService: IUserService,
+        @Inject()
+        private imageService: ImagesService,
     ) {}
+
+
+    async changeClubThumbnail(
+        id: Club["id"],
+        file: Express.Multer.File,
+        authUser: AuthUserPayload
+    ): Promise<Club["thumbnail"]> {
+        const club = await this.clubRepo.findOneBy({ id, creatorId: authUser.id })
+        if (!club) {
+            throw new BadRequestException("Club not found")
+        }
+
+        if (club.thumbnail) {
+            await this.imageService.deleteFile(club.thumbnail)
+        }
+
+        const imageUrl = await this.imageService.uploadFile(
+            file,
+            Buckets.CLUBS,
+            this.createFileName(id, path.extname(file.originalname))
+        )
+        club.thumbnail = imageUrl
+        await club.save()
+        return club.thumbnail
+    }
+
+    private createFileName(id: Club["id"], fileExtension: string) {
+        return `${id}-thumbnail${fileExtension}`
+    }
+
+    async deleteClubThumbnail(id: Club["id"]) {
+        const club = await this.clubRepo.findOneBy({ id })
+        if (!club) {
+            throw new BadRequestException("User not found")
+        }
+
+        if (!club.thumbnail) {
+            return
+        }
+
+        await this.imageService.deleteFile(club.thumbnail)
+        club.thumbnail = null
+        await club.save()
+    }
 
     async addUserToClubFollowers(
         id: Club["id"],

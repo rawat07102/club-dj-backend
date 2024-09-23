@@ -4,7 +4,7 @@ import { AuthUserPayload, FindAllOptions } from "@/shared/utils/types"
 
 export interface IUserService {
     create(dto: CreateUserDto): Promise<User["id"]>
-    changeProfilePic(file: Express.Multer.File, authUser: AuthUserPayload): Promise<User["imageUrl"]>
+    changeProfilePic(file: Express.Multer.File, authUser: AuthUserPayload): Promise<User["profilePic"]>
     deleteProfilePic(id: User["id"]): Promise<void>
     addClubToUserFollow(
         id: User["id"],

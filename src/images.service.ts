@@ -1,10 +1,8 @@
 import { Inject, Injectable } from "@nestjs/common"
 import { DeleteObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3"
 import { ConfigService } from "@nestjs/config"
-import { User } from "./shared/entities"
 import { IConfiguration } from "./shared/config/configuration.interface"
-import { AuthUserPayload, Buckets } from "./shared/utils/types"
-import * as path from "path"
+import { Buckets } from "./shared/utils/types"
 
 @Injectable()
 export class ImagesService {
@@ -37,25 +35,11 @@ export class ImagesService {
         return `${baseUrl}/${bucketName}/${fileName}`
     }
 
-    createFileName(
-        id: User["id"],
-        username: User["username"],
-        file: Express.Multer.File
-    ) {
-        return `${username}-${id}-profile-pic${path.extname(file.originalname)}`
-    }
-
     async uploadFile(
         file: Express.Multer.File,
         bucketName: Buckets,
-        authUser: AuthUserPayload
+        fileName: string,
     ) {
-        const fileName = this.createFileName(
-            authUser.id,
-            authUser.username,
-            file
-        )
-
         const uploadCommand = new PutObjectCommand({
             Bucket: bucketName,
             Key: fileName,
