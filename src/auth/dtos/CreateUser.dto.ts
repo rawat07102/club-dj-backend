@@ -1,9 +1,10 @@
 import { User } from "@/shared/entities"
-import { IsEmail, IsNotEmpty, Length } from "class-validator"
+import { IsAlphanumeric, IsEmail, IsNotEmpty, Length } from "class-validator"
 
 export class CreateUserDto {
     @IsNotEmpty()
     @Length(4, 24)
+    @IsAlphanumeric()
     username: User["username"]
 
     @IsNotEmpty()

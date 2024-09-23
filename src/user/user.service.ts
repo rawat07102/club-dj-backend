@@ -1,18 +1,65 @@
-import { Injectable, InternalServerErrorException } from "@nestjs/common"
+import {
+    BadRequestException,
+    Inject,
+    Injectable,
+    InternalServerErrorException,
+} from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Club, User } from "@/shared/entities"
 import { Repository } from "typeorm"
 import { IUserService } from "./interfaces/IUserService.interface"
 import * as bcrypt from "bcrypt"
-import { FindAllOptions } from "@/shared/utils/types"
+import { AuthUserPayload, Buckets, FindAllOptions } from "@/shared/utils/types"
 import { CreateUserDto } from "@/auth/dtos/CreateUser.dto"
+import { ImagesService } from "@/images.service"
 
 @Injectable()
 export class UserService implements IUserService {
     constructor(
         @InjectRepository(User)
-        private userRepo: Repository<User>
+        private userRepo: Repository<User>,
+        @Inject()
+        private imageService: ImagesService
     ) {}
+
+    async changeProfilePic(
+        file: Express.Multer.File,
+        authUser: AuthUserPayload
+    ): Promise<User["imageUrl"]> {
+        const user = await this.userRepo.findOneBy({ id: authUser.id })
+        if (!user) {
+            throw new BadRequestException("User not found")
+        }
+
+        // TODO: delete old profile pic
+        if (user.imageUrl) {
+            await this.imageService.deleteFile(user.imageUrl)
+        }
+
+        const imageUrl = await this.imageService.uploadFile(
+            file,
+            Buckets.USERS,
+            authUser
+        )
+        user.imageUrl = imageUrl
+        await user.save()
+        return user.imageUrl
+    }
+
+    async deleteProfilePic(id: User["id"]) {
+        const user = await this.userRepo.findOneBy({ id })
+        if (!user) {
+            throw new BadRequestException("User not found")
+        }
+
+        if (!user.imageUrl) {
+            return
+        }
+
+        await this.imageService.deleteFile(user.imageUrl)
+        user.imageUrl = null
+        await user.save()
+    }
 
     addClubToUserFollow(id: User["id"], clubId: Club["id"]): Promise<void> {
         return this.userRepo
@@ -79,7 +126,7 @@ export class UserService implements IUserService {
                 clubsFollowed: true,
                 sharedPlaylists: true,
                 wishlistJoined: true,
-            }
+            },
         })
     }
 

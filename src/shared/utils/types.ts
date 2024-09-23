@@ -6,3 +6,9 @@ export type FindAllOptions = {
     skip?: number
     take?: number
 }
+
+export enum Buckets {
+    USERS = "users",
+    CLUBS = "clubs",
+}
+

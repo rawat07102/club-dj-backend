@@ -3,7 +3,7 @@ import { Routes, Services } from "@/shared/constants"
 import { IAuthService } from "./interfaces/IAuthService.interface"
 import { JwtAuthGuard, LocalAuthGuard } from "./utils/guards"
 import { AuthenticatedUser } from "@/shared/utils/decorators"
-import { AuthenticatedRequest } from "@/shared/utils/interface"
+import { AuthUserPayload } from "@/shared/utils/types"
 
 @Controller(Routes.AUTH)
 export class AuthController {
@@ -14,9 +14,10 @@ export class AuthController {
 
     @UseGuards(LocalAuthGuard)
     @Post()
-    async login(@AuthenticatedUser() authUser: AuthenticatedRequest["user"]) {
+    async login(@AuthenticatedUser() authUser: AuthUserPayload) {
         const token = await this.authService.createToken(authUser)
         return {
+            payload: authUser,
             accessToken: token,
         }
     }
@@ -24,7 +25,7 @@ export class AuthController {
     @Get()
     @UseGuards(JwtAuthGuard)
     async authCheck(
-        @AuthenticatedUser() authUser: AuthenticatedRequest["user"]
+        @AuthenticatedUser() authUser: AuthUserPayload
     ) {
         return authUser
     }

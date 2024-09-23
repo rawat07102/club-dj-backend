@@ -11,7 +11,6 @@ import { Exclude } from "class-transformer"
 import { AbstractEntity } from "./Abstract.entity"
 import { Club } from "./Club.entity"
 import { Playlist } from "./Playlist.entity"
-import { IsEmail } from "class-validator"
 
 @Entity()
 export class User extends AbstractEntity {
@@ -25,8 +24,10 @@ export class User extends AbstractEntity {
     })
     bio: string
 
+    @Column({nullable: true})
+    imageUrl?: string
+
     @Column()
-    @IsEmail()
     email: string
 
     @Column()
