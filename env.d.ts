@@ -11,5 +11,6 @@ namespace NodeJS {
         PROJECT_REGION?: string
         ENDPOINT_URL?: string
         STORAGE_BASE_URL?: string
+        NODE_ENV?: string
     }
 }
