@@ -7,6 +7,7 @@ import {
     ManyToMany,
     JoinColumn,
     JoinTable,
+    AfterLoad,
 } from "typeorm"
 import { AbstractEntity } from "./Abstract.entity"
 import { User } from "./User.entity"
@@ -24,10 +25,10 @@ export class Club extends AbstractEntity {
     })
     description: string
 
-    @Column({nullable: true})
+    @Column({ nullable: true })
     thumbnail?: string
 
-    @Column("simple-array", { nullable: true })
+    @Column("simple-array")
     queue: string[]
 
     @OneToOne(() => User, { nullable: true })
@@ -48,7 +49,14 @@ export class Club extends AbstractEntity {
     @JoinTable()
     followers: User[]
 
+    followersCount: number
+
     @OneToMany(() => Playlist, (playlist) => playlist.club)
     @JoinColumn()
     playlists: Playlist[]
+
+    @AfterLoad()
+    updateCounters() {
+        this.followersCount = this.followers?.length || 0
+    }
 }

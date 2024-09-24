@@ -180,6 +180,7 @@ export class ClubsService implements IClubService {
         authUser: AuthUserPayload
     ): Promise<Club> {
         const newClub = this.clubRepo.create(clubDto)
+        newClub.queue = []
         const user = await this.userService.findById(authUser.id)
         user.clubs.push(newClub)
         await user.save()
