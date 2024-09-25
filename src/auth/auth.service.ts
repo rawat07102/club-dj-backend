@@ -5,6 +5,7 @@ import { IAuthService } from "./interfaces/IAuthService.interface"
 import { Services } from "@/shared/constants"
 import { IUserService } from "@/user/interfaces/IUserService.interface"
 import * as bcrypt from "bcrypt"
+import { instanceToPlain } from "class-transformer"
 
 @Injectable()
 export class AuthService implements IAuthService {
@@ -31,9 +32,10 @@ export class AuthService implements IAuthService {
         return this.jwtService.verifyAsync(token)
     }
 
-    async getUserByAuthToken(token: string) {
+    async getUserByAuthToken(token: string): Promise<AuthUserPayload> {
         const payload = this.jwtService.decode(token) as AuthUserPayload
         const user = await this.userService.findById(payload.id)
-        return user
+
+        return instanceToPlain(user) as AuthUserPayload
     }
 }
