@@ -18,7 +18,7 @@ export interface IClubService {
         id: Club["id"],
         authUser: AuthUserPayload,
     ): Promise<void>
-    create(clubDto: PostClubDto, authUser: AuthUserPayload): Promise<Club>
+    create(clubDto: PostClubDto, authUser: AuthUserPayload): Promise<Club["id"]>
     addVideoToQueue(
         id: Club["id"],
         videoId: string,

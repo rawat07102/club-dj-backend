@@ -178,13 +178,13 @@ export class ClubsService implements IClubService {
     async create(
         clubDto: PostClubDto,
         authUser: AuthUserPayload
-    ): Promise<Club> {
+    ): Promise<Club["id"]> {
         const newClub = this.clubRepo.create(clubDto)
         newClub.queue = []
         const user = await this.userService.findById(authUser.id)
         user.clubs.push(newClub)
         await user.save()
-        return newClub
+        return newClub.id
     }
 
     async findAll({ skip = 0, take = 10 }: FindAllOptions): Promise<Club[]> {

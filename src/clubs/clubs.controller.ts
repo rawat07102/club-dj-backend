@@ -69,6 +69,7 @@ export class ClubsController {
         @UploadedFile() file: Express.Multer.File,
         @AuthenticatedUser() authUser: AuthUserPayload
     ) {
+        console.log("file", file)
         return this.clubService.changeClubThumbnail(clubId, file, authUser)
     }
 

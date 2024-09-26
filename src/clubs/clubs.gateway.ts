@@ -34,9 +34,11 @@ export class ClubsGateway implements OnGatewayConnection {
         >
     ) {
         try {
-            const accessToken =
-                client.handshake.headers.authorization.split(" ")[1]
+            const accessToken = client.handshake.auth.accessToken.split(" ")[1]
             const isValid = await this.authService.verifyToken(accessToken)
+            if (!isValid) {
+                throw new Error("Token verification failed...")
+            }
             const authUser =
                 await this.authService.getUserByAuthToken(accessToken)
             client.data.authUser = authUser
