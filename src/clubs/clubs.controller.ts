@@ -49,9 +49,7 @@ export class ClubsController {
 
     @Get(":clubId")
     async getById(@Param("clubId", ParseIntPipe) clubId: number) {
-        const club = await this.clubService.findById(clubId)
-        console.log(club)
-        return club
+        return this.clubService.findById(clubId)
     }
 
     @Post()
@@ -71,7 +69,6 @@ export class ClubsController {
         @UploadedFile() file: Express.Multer.File,
         @AuthenticatedUser() authUser: AuthUserPayload
     ) {
-        console.log("file", file)
         return this.clubService.changeClubThumbnail(clubId, file, authUser)
     }
 
@@ -93,7 +90,6 @@ export class ClubsController {
         @Body("videoId") videoId: string,
         @AuthenticatedUser() authUser: AuthUserPayload
     ) {
-        console.log(clubId, videoId)
         return this.clubService.addVideoToQueue(clubId, videoId, authUser)
     }
 

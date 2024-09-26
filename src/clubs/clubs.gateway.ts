@@ -1,9 +1,7 @@
 import { IAuthService } from "@/auth/interfaces/IAuthService.interface"
-import { JwtAuthGuard } from "@/auth/utils/guards"
 import { Services } from "@/shared/constants"
-import { AuthenticatedUser } from "@/shared/utils/decorators"
 import { AuthUserPayload } from "@/shared/utils/types"
-import { Inject, UnauthorizedException, UseGuards } from "@nestjs/common"
+import { Inject, UnauthorizedException } from "@nestjs/common"
 import {
     ConnectedSocket,
     MessageBody,
@@ -14,7 +12,11 @@ import {
 } from "@nestjs/websockets"
 import { Server, Socket } from "socket.io"
 
-@WebSocketGateway()
+@WebSocketGateway({
+    cors: {
+        origin: "*",
+    },
+})
 export class ClubsGateway implements OnGatewayConnection {
     constructor(
         @Inject(Services.AUTH_SERVICE)
@@ -34,7 +36,10 @@ export class ClubsGateway implements OnGatewayConnection {
         >
     ) {
         try {
-            const accessToken = client.handshake.auth.accessToken.split(" ")[1]
+            const accessToken = client.handshake.auth.accessToken
+            if (!accessToken) {
+                throw new UnauthorizedException("No token found")
+            }
             const isValid = await this.authService.verifyToken(accessToken)
             if (!isValid) {
                 throw new Error("Token verification failed...")
@@ -59,7 +64,7 @@ export class ClubsGateway implements OnGatewayConnection {
         @ConnectedSocket() client: Socket
     ) {
         const authUser = client.data.authUser
-        client.to(data.clubId).emit("new-message", {
+        this.server.to(data.clubId).emit("new-message", {
             user: authUser,
             message: data.message,
         })

@@ -23,7 +23,7 @@ import { YoutubeModule } from './youtube/youtube.module';
                 type: "postgres",
                 url: configService.get("database.url", { infer: true }),
                 entities: entities,
-                logging: true,
+                logging: process.env.NODE_ENV === "dev",
                 synchronize: process.env.NODE_ENV === "dev",
             }),
             inject: [ConfigService],
