@@ -17,7 +17,7 @@ export interface IConfiguration {
         endpoint_url: string
         region: string
     }
-    //"youtube.apiKey": string
-    //"youtube.apiUrl": string
-    //"youtube.embed": string
+    yt: {
+        api_key: string
+    }
 }

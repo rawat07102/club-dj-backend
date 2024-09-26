@@ -12,6 +12,7 @@ export const configuration = (): IConfiguration => {
         STORAGE_BASE_URL,
         PROJECT_REGION,
         ENDPOINT_URL,
+        YT_API_KEY
     } = process.env
     const missingKeys = []
     if (!DB_URL) missingKeys.push("DB_URL")
@@ -22,6 +23,7 @@ export const configuration = (): IConfiguration => {
     if (!STORAGE_BASE_URL) missingKeys.push("STORAGE_BASE_URL")
     if (!PROJECT_REGION) missingKeys.push("PROJECT_REGION")
     if (!ENDPOINT_URL) missingKeys.push("ENDPOINT_URL")
+    if (!YT_API_KEY) missingKeys.push("YT_API_KEY")
 
     if (missingKeys.length > 0) {
         let message = missingKeys.join("\n")
@@ -42,5 +44,8 @@ export const configuration = (): IConfiguration => {
             endpoint_url: ENDPOINT_URL,
             region: PROJECT_REGION,
         },
+        yt: {
+            api_key: YT_API_KEY
+        }
     }
 }

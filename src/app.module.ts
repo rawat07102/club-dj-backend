@@ -8,6 +8,7 @@ import { UserModule } from "./user/user.module"
 import { ClubsModule } from "./clubs/clubs.module"
 import { entities } from "./shared/entities"
 import { PlaylistsModule } from "./playlists/playlists.module"
+import { YoutubeModule } from './youtube/youtube.module';
 
 @Module({
     imports: [
@@ -31,6 +32,7 @@ import { PlaylistsModule } from "./playlists/playlists.module"
         UserModule,
         ClubsModule,
         PlaylistsModule,
+        YoutubeModule,
     ],
 })
 export class AppModule {}

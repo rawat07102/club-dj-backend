@@ -49,7 +49,9 @@ export class ClubsController {
 
     @Get(":clubId")
     async getById(@Param("clubId", ParseIntPipe) clubId: number) {
-        return this.clubService.findById(clubId)
+        const club = await this.clubService.findById(clubId)
+        console.log(club)
+        return club
     }
 
     @Post()
@@ -91,6 +93,7 @@ export class ClubsController {
         @Body("videoId") videoId: string,
         @AuthenticatedUser() authUser: AuthUserPayload
     ) {
+        console.log(clubId, videoId)
         return this.clubService.addVideoToQueue(clubId, videoId, authUser)
     }
 

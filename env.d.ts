@@ -12,5 +12,6 @@ namespace NodeJS {
         ENDPOINT_URL?: string
         STORAGE_BASE_URL?: string
         NODE_ENV?: string
+        YT_API_KEY?: string
     }
 }

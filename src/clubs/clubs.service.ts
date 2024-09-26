@@ -1,4 +1,10 @@
-import { BadRequestException, Inject, Injectable, UnauthorizedException } from "@nestjs/common"
+import {
+    BadRequestException,
+    ConflictException,
+    Inject,
+    Injectable,
+    UnauthorizedException,
+} from "@nestjs/common"
 import { IClubService } from "./interfaces/IClubService.interface"
 import { Club, User } from "@/shared/entities"
 import { AuthUserPayload, Buckets, FindAllOptions } from "@/shared/utils/types"
@@ -19,16 +25,18 @@ export class ClubsService implements IClubService {
         @Inject(Services.USER_SERVICE)
         private userService: IUserService,
         @Inject()
-        private imageService: ImagesService,
+        private imageService: ImagesService
     ) {}
-
 
     async changeClubThumbnail(
         id: Club["id"],
         file: Express.Multer.File,
         authUser: AuthUserPayload
     ): Promise<Club["thumbnail"]> {
-        const club = await this.clubRepo.findOneBy({ id, creatorId: authUser.id })
+        const club = await this.clubRepo.findOneBy({
+            id,
+            creatorId: authUser.id,
+        })
         if (!club) {
             throw new BadRequestException("Club not found")
         }
@@ -104,6 +112,9 @@ export class ClubsService implements IClubService {
         }
 
         if (club.queue) {
+            if (club.queue.includes(videoId)) {
+                throw new ConflictException("Video already in queue")
+            }
             club.queue.push(videoId)
         } else {
             club.queue = [videoId]
@@ -211,6 +222,9 @@ export class ClubsService implements IClubService {
 
     async delete(id: Club["id"]): Promise<boolean> {
         const club = await this.clubRepo.findOneBy({ id })
+        if (club.thumbnail) {
+            await this.imageService.deleteFile(club.thumbnail)
+        }
         await club.remove()
         return true
     }
