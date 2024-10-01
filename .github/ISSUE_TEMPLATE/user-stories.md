@@ -1,19 +1,23 @@
 ---
-name: User Stories
-about: Describe functionality from users perspective
-title: "[Feature]"
-labels: enhancement
-assignees: rawat07102
+name: User Story
+about: The template is for creating user stories
+title: ''
+labels: ''
+assignees: '@rawat07102'
 
 ---
 
-## Story
-As a [[ User ]],
-when, [[ Condition ]]
-I want, [[ Result ]]
-
-## Assumptions
-- 
-
-## Constraints
--
+**As a** [role]  
+ **I need** [function]  
+ **So that** [benefit]  
+   
+ ### Details and Assumptions
+ * [document what you know]
+   
+ ### Acceptance Criteria  
+   
+ ```gherkin
+ Given [some context]
+ When [certain action is taken]
+ Then [the outcome of action is observed]
+ ```
