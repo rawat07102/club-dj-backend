@@ -187,7 +187,7 @@ export class ClubsService implements IClubService {
     }
 
     async create(
-        clubDto: PostClubDto,
+        { genreIds, ...clubDto }: PostClubDto,
         authUser: AuthUserPayload
     ): Promise<Club["id"]> {
         const newClub = this.clubRepo.create(clubDto)
@@ -195,6 +195,11 @@ export class ClubsService implements IClubService {
         const user = await this.userService.findById(authUser.id)
         user.clubs.push(newClub)
         await user.save()
+        await this.clubRepo
+            .createQueryBuilder()
+            .relation(Club, "genres")
+            .of(newClub)
+            .add(genreIds)
         return newClub.id
     }
 
@@ -216,6 +221,7 @@ export class ClubsService implements IClubService {
                 followers: true,
                 playlists: true,
                 djWishlist: true,
+                genres: true,
             },
         })
     }
