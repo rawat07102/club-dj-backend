@@ -9,6 +9,7 @@ import { ClubsModule } from "./clubs/clubs.module"
 import { entities } from "./shared/entities"
 import { PlaylistsModule } from "./playlists/playlists.module"
 import { YoutubeModule } from './youtube/youtube.module';
+import { GenresModule } from './genres/genres.module';
 
 @Module({
     imports: [
@@ -33,6 +34,7 @@ import { YoutubeModule } from './youtube/youtube.module';
         ClubsModule,
         PlaylistsModule,
         YoutubeModule,
+        GenresModule,
     ],
 })
 export class AppModule {}

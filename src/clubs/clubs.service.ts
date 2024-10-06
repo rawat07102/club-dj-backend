@@ -6,7 +6,7 @@ import {
     UnauthorizedException,
 } from "@nestjs/common"
 import { IClubService } from "./interfaces/IClubService.interface"
-import { Club, User } from "@/shared/entities"
+import { Club, Genre, User } from "@/shared/entities"
 import { AuthUserPayload, Buckets, FindAllOptions } from "@/shared/utils/types"
 import { PostClubDto } from "./dtos/PostClub.dto"
 import { InjectRepository } from "@nestjs/typeorm"
@@ -16,12 +16,15 @@ import { Services } from "@/shared/constants"
 import { PatchClubDto } from "./dtos/PatchClub.dto"
 import { ImagesService } from "@/images.service"
 import * as path from "path"
+import { IGenresService } from "@/genres/interfaces/IGenresService.interface"
 
 @Injectable()
 export class ClubsService implements IClubService {
     constructor(
         @InjectRepository(Club)
         private clubRepo: Repository<Club>,
+        @Inject(Services.GENRES_SERVICE)
+        private genreService: IGenresService,
         @Inject(Services.USER_SERVICE)
         private userService: IUserService,
         @Inject()
@@ -240,7 +243,7 @@ export class ClubsService implements IClubService {
         dto: PatchClubDto,
         authUser: AuthUserPayload
     ): Promise<Club> {
-        const { name, description } = dto
+        const { name, description, genreIds } = dto
         const club = await this.clubRepo.findOne({
             relations: {
                 creator: true,
@@ -257,6 +260,13 @@ export class ClubsService implements IClubService {
         }
         if (description) {
             club.description = description
+        }
+        if (genreIds) {
+            let genres: Genre[] = []
+            if (genreIds.length > 0) {
+                genres = await this.genreService.findbyIds(genreIds)
+            }
+            club.genres = genres
         }
         await club.save()
         return club

@@ -10,6 +10,7 @@ export enum Services {
     USER_SERVICE = "USER_SERVICE",
     YOUTUBE_SERVICE = "YOUTUBE_SERVICE",
     PLAYLISTS_SERVICE = "PLAYLISTS_SERVICE",
+    GENRES_SERVICE = "GENRES_SERVICE",
 }
 
 export enum Routes {
@@ -17,4 +18,5 @@ export enum Routes {
     USERS = "users",
     CLUBS = "clubs",
     PLAYLISTS = "playlists",
+    GENRES = "genres",
 }

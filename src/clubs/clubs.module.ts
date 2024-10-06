@@ -9,6 +9,7 @@ import { PlaylistsModule } from "@/playlists/playlists.module"
 import { ImagesService } from "@/images.service"
 import { ClubsGateway } from "./clubs.gateway"
 import { AuthModule } from "@/auth/auth.module"
+import { GenresModule } from "@/genres/genres.module"
 
 @Module({
     imports: [
@@ -16,6 +17,7 @@ import { AuthModule } from "@/auth/auth.module"
         UserModule,
         PlaylistsModule,
         AuthModule,
+        GenresModule,
     ],
     providers: [
         {
