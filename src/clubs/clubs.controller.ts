@@ -63,7 +63,7 @@ export class ClubsController {
 
     @Put(":clubId/thumbnail")
     @UseGuards(JwtAuthGuard)
-    @UseInterceptors(FileInterceptor("file"))
+    @UseInterceptors(FileInterceptor("thumbnail"))
     async uploadClubThumbnail(
         @Param("clubId", ParseIntPipe) clubId: number,
         @UploadedFile() file: Express.Multer.File,
