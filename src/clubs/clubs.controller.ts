@@ -39,11 +39,13 @@ export class ClubsController {
     @Get()
     async getAllClubs(
         @Query("skip") skip: number,
-        @Query("take") take: number
+        @Query("take") take: number,
+        @Query("searchQuery") searchQuery: string,
     ) {
         return this.clubService.findAll({
             skip,
             take,
+            searchQuery,
         })
     }
 

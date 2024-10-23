@@ -206,11 +206,20 @@ export class ClubsService implements IClubService {
         return newClub.id
     }
 
-    async findAll({ skip = 0, take = 10 }: FindAllOptions): Promise<Club[]> {
-        return this.clubRepo.find({
-            skip,
-            take,
-        })
+    async findAll({
+        skip = 0,
+        take = 10,
+        searchQuery,
+    }: FindAllOptions): Promise<Club[]> {
+        return this.clubRepo
+            .createQueryBuilder("club")
+            .addSelect("similarity(name, :searchQuery)", "score")
+            .where("similarity(name, :searchQuery) > 0.1")
+            .setParameter("searchQuery", searchQuery)
+            .orderBy("score", "DESC")
+            .take(take)
+            .skip(skip)
+            .getMany()
     }
 
     async findById(id: Club["id"]): Promise<Club> {
