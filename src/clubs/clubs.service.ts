@@ -211,15 +211,19 @@ export class ClubsService implements IClubService {
         take = 10,
         searchQuery,
     }: FindAllOptions): Promise<Club[]> {
-        return this.clubRepo
+        let query =  this.clubRepo
             .createQueryBuilder("club")
-            .addSelect("similarity(name, :searchQuery)", "score")
+            .take(take)
+            .skip(skip)
+
+        if (searchQuery) {
+            query = query.addSelect("similarity(name, :searchQuery)", "score")
             .where("similarity(name, :searchQuery) > 0.1")
             .setParameter("searchQuery", searchQuery)
             .orderBy("score", "DESC")
-            .take(take)
-            .skip(skip)
-            .getMany()
+        }
+
+        return query.getMany()
     }
 
     async findById(id: Club["id"]): Promise<Club> {
