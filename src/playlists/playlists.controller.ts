@@ -5,14 +5,21 @@ import { AuthUserPayload } from "@/shared/utils/types"
 import {
     Body,
     Controller,
+    Delete,
+    Get,
     Inject,
     Param,
     ParseIntPipe,
-    Patch,
+    Post,
+    Put,
+    UploadedFile,
     UseGuards,
+    UseInterceptors,
 } from "@nestjs/common"
-import { UpdatePlaylistDto } from "./dtos/update-playlist.dto"
 import { IPlaylistService } from "./interfaces/IPlaylistService.interface"
+import { CreatePlaylistDto } from "./dtos/create-playlist.dto"
+import { FileInterceptor } from "@nestjs/platform-express"
+import { Playlist } from "@/shared/entities"
 
 @Controller(Routes.PLAYLISTS)
 export class PlaylistsController {
@@ -21,20 +28,62 @@ export class PlaylistsController {
         private readonly playlistService: IPlaylistService
     ) {}
 
+    @Get(":playlistId")
+    async getPlaylistById(
+        @Param("playlistId", ParseIntPipe) playlistId: number
+    ) {
+        return this.playlistService.findById(playlistId)
+    }
+
+    @Post()
     @UseGuards(JwtAuthGuard)
-    @Patch(":playlistId/list")
-    async updatePlaylistVideoList(
+    async createPlaylist(
+        @Body() dto: CreatePlaylistDto,
+        @AuthenticatedUser() authUser: AuthUserPayload
+    ) {
+        return this.playlistService.create(dto, authUser)
+    }
+
+    @Put(":playlistId/thumbnail")
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(FileInterceptor("thumbnail"))
+    async changeThumbnail(
         @Param("playlistId", ParseIntPipe) playlistId: number,
         @AuthenticatedUser() authUser: AuthUserPayload,
-        @Body() dto: UpdatePlaylistDto
+        @UploadedFile() file: Express.Multer.File
     ) {
-        const playlist = await this.playlistService.searchUsersPlaylsits(
-            authUser.id,
-            playlistId
+        return this.playlistService.changePlaylistThumbnail(
+            playlistId,
+            file,
+            authUser
         )
+    }
 
-        // 1. find playlist with id && user as creator
-        // 2. figure out the operation from the ops
-        // 3. update each and save at the end
+    @Put(":playlistId/list")
+    @UseGuards(JwtAuthGuard)
+    async addVideoToPlaylist(
+        @Param("playlistId", ParseIntPipe) playlistId: number,
+        @AuthenticatedUser() authUser: AuthUserPayload,
+        @Body("videoId") videoId: string
+    ) {
+        return this.playlistService.addVideoToPlaylist(
+            playlistId,
+            videoId,
+            authUser
+        )
+    }
+
+    @Delete(":playlistId/list/:videoId")
+    @UseGuards(JwtAuthGuard)
+    async removeVideoFromPlaylist(
+        @Param("playlistId", ParseIntPipe) playlistId: number,
+        @Param("videoId") videoId: string,
+        @AuthenticatedUser() authUser: AuthUserPayload,
+    ) {
+        return this.playlistService.removeVideoFromPlaylist(
+            playlistId,
+            videoId,
+            authUser
+        )
     }
 }

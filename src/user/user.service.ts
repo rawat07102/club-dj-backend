@@ -128,7 +128,7 @@ export class UserService implements IUserService {
                 playlists: true,
                 clubs: true,
                 clubsFollowed: true,
-                sharedPlaylists: true,
+                //sharedPlaylists: true,
                 wishlistJoined: true,
             },
         })

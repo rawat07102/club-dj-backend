@@ -8,23 +8,25 @@ export class Playlist extends AbstractEntity {
     @Column()
     name: string
 
-    @Column("simple-array")
-    list: string[]
+    @Column("simple-array", { nullable: true })
+    list?: string[]
 
     @Column({
         default: "",
     })
     description: string
 
-    @Column()
+    @Column({nullable: true})
+    thumbnail?: string
+
+    @Column({ default: 0 })
     likeCount: number
 
     @ManyToOne(() => User, (user) => user.playlists)
     creator: User
+    @Column()
+    creatorId: number
 
     @ManyToOne(() => Club, (club) => club.playlists)
     club: Club
-
-    @ManyToMany(() => User, (user) => user.sharedPlaylists)
-    sharedWith: User[]
 }

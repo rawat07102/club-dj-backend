@@ -3,6 +3,7 @@ import { DeleteObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client
 import { ConfigService } from "@nestjs/config"
 import { IConfiguration } from "./shared/config/configuration.interface"
 import { Buckets } from "./shared/utils/types"
+import { AbstractEntity } from "./shared/entities/Abstract.entity"
 
 @Injectable()
 export class ImagesService {
@@ -26,6 +27,10 @@ export class ImagesService {
             forcePathStyle: true
 
         })
+    }
+
+    createFileName(id: AbstractEntity["id"], fileExtension: string) {
+        return `${id}-thumbnail${fileExtension}`
     }
 
     createImageUrl(fileName: string, bucketName: Buckets) {

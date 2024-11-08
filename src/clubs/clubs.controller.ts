@@ -40,7 +40,7 @@ export class ClubsController {
     async getAllClubs(
         @Query("skip") skip: number,
         @Query("take") take: number,
-        @Query("searchQuery") searchQuery: string,
+        @Query("searchQuery") searchQuery: string
     ) {
         return this.clubService.findAll({
             skip,
@@ -76,14 +76,12 @@ export class ClubsController {
 
     @Delete(":clubId/thumbnail")
     @UseGuards(JwtAuthGuard)
-    @UseInterceptors(FileInterceptor("file"))
     async deleteThumbnail(
         @Param("clubId", ParseIntPipe) clubId: number,
         @AuthenticatedUser() authUser: AuthUserPayload
     ) {
         return this.clubService.deleteClubThumbnail(clubId, authUser)
     }
-
 
     @Put(":clubId/queue")
     @UseGuards(JwtAuthGuard)
@@ -134,6 +132,15 @@ export class ClubsController {
     }
 
     @UseGuards(JwtAuthGuard)
+    @Get(":clubId/playlists")
+    async getPlaylists(
+        @Param("clubId", ParseIntPipe) clubId: number,
+    ) {
+        const club = await this.clubService.findById(clubId)
+        return club.playlists
+    }
+
+    @UseGuards(JwtAuthGuard)
     @Post(":clubId/playlists")
     async createNewPlaylist(
         @Param("clubId", ParseIntPipe) clubId: number,
@@ -145,10 +152,23 @@ export class ClubsController {
         }
 
         const newPlaylist = await this.playlistService.create(dto, authUser)
-        const club = await this.clubService.findById(clubId)
-        newPlaylist.club = club
-        await newPlaylist.save()
+        await this.clubService.addPlaylistToClub(clubId, newPlaylist.id)
+        console.log(newPlaylist)
         return newPlaylist
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Delete(":clubId/playlists/:playlistId")
+    async deletePlaylist(
+        @Param("clubId", ParseIntPipe) clubId: number,
+        @Param("playlistId", ParseIntPipe) playlistId: number,
+        @AuthenticatedUser() authUser: AuthUserPayload
+    ) {
+        if (!this.clubService.isCreator(clubId, authUser.id)) {
+            throw new UnauthorizedException()
+        }
+
+        return this.clubService.removePlaylistFromClub(clubId, playlistId)
     }
 
     @UseGuards(JwtAuthGuard)

@@ -16,7 +16,7 @@ export class YoutubeController {
             params: {
                 id: videoId,
                 part: "snippet,statistics",
-                fields: "items(id,snippet(title, thumbnails(medium), categoryId, publishedAt),statistics(viewCount))",
+                fields: "items(id,snippet(title, thumbnails(medium), categoryId, publishedAt, channelTitle),statistics(viewCount))",
                 key: this.configService.get("yt.api_key", { infer: true }),
             },
             baseURL: "https://youtube.googleapis.com/youtube/v3",

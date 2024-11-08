@@ -47,9 +47,9 @@ export class User extends AbstractEntity {
     @JoinColumn()
     playlists: Playlist[]
 
-    @JoinTable()
-    @ManyToMany(() => Playlist, (playlist) => playlist.sharedWith)
-    sharedPlaylists: Playlist[]
+    //@JoinTable()
+    //@ManyToMany(() => Playlist, (playlist) => playlist.sharedWith)
+    //sharedPlaylists: Playlist[]
 
     @OneToMany(() => Club, (club) => club.creator, {
         cascade: ["insert"]

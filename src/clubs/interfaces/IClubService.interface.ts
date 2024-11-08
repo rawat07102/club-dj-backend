@@ -1,4 +1,4 @@
-import { Club, User } from "@/shared/entities"
+import { Club, Playlist, User } from "@/shared/entities"
 import { AuthUserPayload, FindAllOptions } from "@/shared/utils/types"
 import { PostClubDto } from "../dtos/PostClub.dto"
 import { PatchClubDto } from "../dtos/PatchClub.dto"
@@ -12,11 +12,11 @@ export interface IClubService {
     changeClubThumbnail(
         id: Club["id"],
         file: Express.Multer.File,
-        authUser: AuthUserPayload,
+        authUser: AuthUserPayload
     ): Promise<Club["thumbnail"]>
     deleteClubThumbnail(
         id: Club["id"],
-        authUser: AuthUserPayload,
+        authUser: AuthUserPayload
     ): Promise<void>
     create(clubDto: PostClubDto, authUser: AuthUserPayload): Promise<Club["id"]>
     addVideoToQueue(
@@ -53,4 +53,12 @@ export interface IClubService {
     findById(id: Club["id"]): Promise<Club>
     delete(id: Club["id"], authUser: AuthUserPayload): Promise<boolean>
     isCreator(clubId: Club["id"], userId: User["id"]): Promise<boolean>
+    addPlaylistToClub(
+        clubId: Club["id"],
+        playlistId: Playlist["id"]
+    ): Promise<void>
+    removePlaylistFromClub(
+        clubId: Club["id"],
+        playlistId: Playlist["id"]
+    ): Promise<void>
 }

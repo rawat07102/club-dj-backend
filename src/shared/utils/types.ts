@@ -11,4 +11,5 @@ export type FindAllOptions = {
 export enum Buckets {
     USERS = "users",
     CLUBS = "clubs",
+    PLAYLISTS = "playlists"
 }

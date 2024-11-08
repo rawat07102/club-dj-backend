@@ -6,7 +6,7 @@ import {
     UnauthorizedException,
 } from "@nestjs/common"
 import { IClubService } from "./interfaces/IClubService.interface"
-import { Club, Genre, User } from "@/shared/entities"
+import { Club, Genre, Playlist, User } from "@/shared/entities"
 import { AuthUserPayload, Buckets, FindAllOptions } from "@/shared/utils/types"
 import { PostClubDto } from "./dtos/PostClub.dto"
 import { InjectRepository } from "@nestjs/typeorm"
@@ -30,6 +30,25 @@ export class ClubsService implements IClubService {
         @Inject()
         private imageService: ImagesService
     ) {}
+
+    async addPlaylistToClub(clubId: Club["id"], playlistId: Playlist["id"]) {
+        return this.clubRepo
+            .createQueryBuilder()
+            .relation(Club, "playlists")
+            .of(clubId)
+            .add(playlistId)
+    }
+
+    async removePlaylistFromClub(
+        clubId: Club["id"],
+        playlistId: Playlist["id"]
+    ) {
+        return this.clubRepo
+            .createQueryBuilder()
+            .relation(Club, "playlists")
+            .of(clubId)
+            .remove(playlistId)
+    }
 
     async changeClubThumbnail(
         id: Club["id"],
@@ -211,16 +230,17 @@ export class ClubsService implements IClubService {
         take = 10,
         searchQuery,
     }: FindAllOptions): Promise<Club[]> {
-        let query =  this.clubRepo
+        let query = this.clubRepo
             .createQueryBuilder("club")
             .take(take)
             .skip(skip)
 
         if (searchQuery) {
-            query = query.addSelect("similarity(name, :searchQuery)", "score")
-            .where("similarity(name, :searchQuery) > 0.1")
-            .setParameter("searchQuery", searchQuery)
-            .orderBy("score", "DESC")
+            query = query
+                .addSelect("similarity(name, :searchQuery)", "score")
+                .where("similarity(name, :searchQuery) > 0.1")
+                .setParameter("searchQuery", searchQuery)
+                .orderBy("score", "DESC")
         }
 
         return query.getMany()
