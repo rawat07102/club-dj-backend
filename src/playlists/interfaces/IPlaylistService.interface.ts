@@ -1,10 +1,10 @@
-import { Club, Playlist } from "@/shared/entities"
-import { CreatePlaylistDto } from "../dtos/create-playlist.dto"
+import { Club, Playlist, User } from "@/shared/entities"
 import { AuthUserPayload } from "@/shared/utils/types"
 
 export interface IPlaylistService {
+    findAll(): Promise<Playlist[]>
     findById(id: Playlist["id"]): Promise<Playlist>
-    create(dto: CreatePlaylistDto, authUser: AuthUserPayload): Promise<Playlist>
+    create(name: string, authUser: AuthUserPayload): Promise<Playlist>
     changePlaylistThumbnail(
         id: Playlist["id"],
         file: Express.Multer.File,
@@ -20,4 +20,6 @@ export interface IPlaylistService {
         videoId: string,
         authUser: AuthUserPayload
     ): Promise<void>
+    delete(id: Playlist["id"]): Promise<void>
+    isCreator(id: Playlist["id"], userId: User["id"]): Promise<boolean>
 }

@@ -1,6 +1,5 @@
 import { Club, Genre } from "@/shared/entities"
 import {
-    IsInt,
     IsOptional,
     IsString,
 } from "class-validator"
@@ -15,7 +14,6 @@ export class PatchClubDto {
     description?: Club["description"]
 
     @IsOptional()
-    @IsInt({ each: true })
     genreIds?: Genre["id"][]
 }
 

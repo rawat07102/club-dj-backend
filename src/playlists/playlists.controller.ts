@@ -10,16 +10,14 @@ import {
     Inject,
     Param,
     ParseIntPipe,
-    Post,
     Put,
+    UnauthorizedException,
     UploadedFile,
     UseGuards,
     UseInterceptors,
 } from "@nestjs/common"
 import { IPlaylistService } from "./interfaces/IPlaylistService.interface"
-import { CreatePlaylistDto } from "./dtos/create-playlist.dto"
 import { FileInterceptor } from "@nestjs/platform-express"
-import { Playlist } from "@/shared/entities"
 
 @Controller(Routes.PLAYLISTS)
 export class PlaylistsController {
@@ -28,20 +26,16 @@ export class PlaylistsController {
         private readonly playlistService: IPlaylistService
     ) {}
 
+    @Get()
+    async getAll() {
+        return this.playlistService.findAll()
+    }
+
     @Get(":playlistId")
     async getPlaylistById(
         @Param("playlistId", ParseIntPipe) playlistId: number
     ) {
         return this.playlistService.findById(playlistId)
-    }
-
-    @Post()
-    @UseGuards(JwtAuthGuard)
-    async createPlaylist(
-        @Body() dto: CreatePlaylistDto,
-        @AuthenticatedUser() authUser: AuthUserPayload
-    ) {
-        return this.playlistService.create(dto, authUser)
     }
 
     @Put(":playlistId/thumbnail")
@@ -78,12 +72,24 @@ export class PlaylistsController {
     async removeVideoFromPlaylist(
         @Param("playlistId", ParseIntPipe) playlistId: number,
         @Param("videoId") videoId: string,
-        @AuthenticatedUser() authUser: AuthUserPayload,
+        @AuthenticatedUser() authUser: AuthUserPayload
     ) {
         return this.playlistService.removeVideoFromPlaylist(
             playlistId,
             videoId,
             authUser
         )
+    }
+
+    @Delete(":playlistId")
+    @UseGuards(JwtAuthGuard)
+    async delete(
+        @Param("playlistId", ParseIntPipe) playlistId: number,
+        @AuthenticatedUser() authUser: AuthUserPayload
+    ) {
+        if (!(await this.playlistService.isCreator(playlistId, authUser.id))) {
+            throw new UnauthorizedException("Operation not allowed.")
+        }
+        return this.playlistService.delete(playlistId)
     }
 }

@@ -8,7 +8,6 @@ import {
 import { IClubService } from "./interfaces/IClubService.interface"
 import { Club, Genre, Playlist, User } from "@/shared/entities"
 import { AuthUserPayload, Buckets, FindAllOptions } from "@/shared/utils/types"
-import { PostClubDto } from "./dtos/PostClub.dto"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository } from "typeorm"
 import { IUserService } from "@/user/interfaces/IUserService.interface"
@@ -17,6 +16,7 @@ import { PatchClubDto } from "./dtos/PatchClub.dto"
 import { ImagesService } from "@/images.service"
 import * as path from "path"
 import { IGenresService } from "@/genres/interfaces/IGenresService.interface"
+import { IPlaylistService } from "@/playlists/interfaces/IPlaylistService.interface"
 
 @Injectable()
 export class ClubsService implements IClubService {
@@ -28,15 +28,24 @@ export class ClubsService implements IClubService {
         @Inject(Services.USER_SERVICE)
         private userService: IUserService,
         @Inject()
-        private imageService: ImagesService
+        private imageService: ImagesService,
+        @Inject(Services.PLAYLISTS_SERVICE)
+        private playlistService: IPlaylistService
     ) {}
 
-    async addPlaylistToClub(clubId: Club["id"], playlistId: Playlist["id"]) {
-        return this.clubRepo
+    async addPlaylistToClub(clubId: Club["id"], authUser: AuthUserPayload) {
+        const club = await this.clubRepo.findOneBy({ id: clubId })
+        const newPlaylist = await this.playlistService.create(
+            `Playlist #${club.playlists.length + 1}`,
+            authUser
+        )
+        await this.clubRepo
             .createQueryBuilder()
             .relation(Club, "playlists")
             .of(clubId)
-            .add(playlistId)
+            .add(newPlaylist.id)
+
+        return newPlaylist.id
     }
 
     async removePlaylistFromClub(
@@ -208,20 +217,15 @@ export class ClubsService implements IClubService {
         return club.currentDJ
     }
 
-    async create(
-        { genreIds, ...clubDto }: PostClubDto,
-        authUser: AuthUserPayload
-    ): Promise<Club["id"]> {
-        const newClub = this.clubRepo.create(clubDto)
-        newClub.queue = []
+    async create(authUser: AuthUserPayload): Promise<Club["id"]> {
         const user = await this.userService.findById(authUser.id)
+        const newClub = this.clubRepo.create({
+            name: `Club #${user.clubs.length + 1}`,
+            description: "",
+        })
+        newClub.queue = []
         user.clubs.push(newClub)
         await user.save()
-        await this.clubRepo
-            .createQueryBuilder()
-            .relation(Club, "genres")
-            .of(newClub)
-            .add(genreIds)
         return newClub.id
     }
 

@@ -29,7 +29,7 @@ export class Club extends AbstractEntity {
     @Column()
     description: string
 
-    @Column({ nullable: true})
+    @Column({ nullable: true })
     @IsUrl()
     thumbnail: string
 
@@ -39,9 +39,6 @@ export class Club extends AbstractEntity {
 
     @ManyToMany(() => Genre)
     @JoinTable()
-    @IsInt({
-        each: true,
-    })
     genres: Genre[]
 
     @OneToOne(() => User, { nullable: true })

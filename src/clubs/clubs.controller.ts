@@ -57,10 +57,9 @@ export class ClubsController {
     @Post()
     @UseGuards(JwtAuthGuard)
     async create(
-        @Body() dto: PostClubDto,
         @AuthenticatedUser() authUser: AuthUserPayload
     ) {
-        return this.clubService.create(dto, authUser)
+        return this.clubService.create(authUser)
     }
 
     @Put(":clubId/thumbnail")
@@ -145,16 +144,12 @@ export class ClubsController {
     async createNewPlaylist(
         @Param("clubId", ParseIntPipe) clubId: number,
         @AuthenticatedUser() authUser: AuthUserPayload,
-        @Body() dto: CreatePlaylistDto
     ) {
         if (!this.clubService.isCreator(clubId, authUser.id)) {
             throw new UnauthorizedException()
         }
 
-        const newPlaylist = await this.playlistService.create(dto, authUser)
-        await this.clubService.addPlaylistToClub(clubId, newPlaylist.id)
-        console.log(newPlaylist)
-        return newPlaylist
+        return this.clubService.addPlaylistToClub(clubId, authUser)
     }
 
     @UseGuards(JwtAuthGuard)
@@ -168,7 +163,8 @@ export class ClubsController {
             throw new UnauthorizedException()
         }
 
-        return this.clubService.removePlaylistFromClub(clubId, playlistId)
+        await this.clubService.removePlaylistFromClub(clubId, playlistId)
+        return this.playlistService.delete(playlistId)
     }
 
     @UseGuards(JwtAuthGuard)

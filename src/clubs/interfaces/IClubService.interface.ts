@@ -1,6 +1,5 @@
 import { Club, Playlist, User } from "@/shared/entities"
 import { AuthUserPayload, FindAllOptions } from "@/shared/utils/types"
-import { PostClubDto } from "../dtos/PostClub.dto"
 import { PatchClubDto } from "../dtos/PatchClub.dto"
 
 export interface IClubService {
@@ -18,7 +17,7 @@ export interface IClubService {
         id: Club["id"],
         authUser: AuthUserPayload
     ): Promise<void>
-    create(clubDto: PostClubDto, authUser: AuthUserPayload): Promise<Club["id"]>
+    create(authUser: AuthUserPayload): Promise<Club["id"]>
     addVideoToQueue(
         id: Club["id"],
         videoId: string,
@@ -55,8 +54,8 @@ export interface IClubService {
     isCreator(clubId: Club["id"], userId: User["id"]): Promise<boolean>
     addPlaylistToClub(
         clubId: Club["id"],
-        playlistId: Playlist["id"]
-    ): Promise<void>
+        authUser: AuthUserPayload
+    ): Promise<Playlist["id"]>
     removePlaylistFromClub(
         clubId: Club["id"],
         playlistId: Playlist["id"]

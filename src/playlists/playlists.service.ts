@@ -1,5 +1,11 @@
 import { Club, Playlist, User } from "@/shared/entities"
-import { BadRequestException, ConflictException, Inject, Injectable, UnauthorizedException } from "@nestjs/common"
+import {
+    BadRequestException,
+    ConflictException,
+    Inject,
+    Injectable,
+    UnauthorizedException,
+} from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository } from "typeorm"
 import { IPlaylistService } from "./interfaces/IPlaylistService.interface"
@@ -16,18 +22,22 @@ export class PlaylistsService implements IPlaylistService {
         @InjectRepository(Playlist)
         private readonly playlistRepo: Repository<Playlist>,
 
-        @Inject(Services.USER_SERVICE)
-        private readonly userService: IUserService,
-
         @Inject()
         private imageService: ImagesService
     ) {}
 
+    async findAll(): Promise<Playlist[]> {
+        return this.playlistRepo.find({})
+    }
+
     async create(
-        dto: CreatePlaylistDto,
+        name: string,
         authUser: AuthUserPayload
     ): Promise<Playlist> {
-        const newPlaylist = this.playlistRepo.create(dto)
+        const newPlaylist = this.playlistRepo.create({
+            name
+        })
+
         await this.playlistRepo
             .createQueryBuilder()
             .relation(User, "playlists")
@@ -117,4 +127,21 @@ export class PlaylistsService implements IPlaylistService {
         await playlist.save()
     }
 
+    async delete(id: Playlist["id"]): Promise<void> {
+        const playlist = await this.playlistRepo.findOneBy({ id })
+        if (playlist.thumbnail) {
+            await this.imageService.deleteFile(playlist.thumbnail)
+        }
+        await playlist.remove()
+    }
+
+    async isCreator(id: Playlist["id"], userId: User["id"]): Promise<boolean> {
+        const playlist = await this.playlistRepo.findOne({
+            where: {
+                id,
+            },
+        })
+
+        return playlist.creatorId === userId
+    }
 }

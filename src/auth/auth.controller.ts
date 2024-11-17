@@ -16,6 +16,7 @@ export class AuthController {
     @Post()
     async login(@AuthenticatedUser() authUser: AuthUserPayload) {
         const token = await this.authService.createToken(authUser)
+        console.log(authUser, token)
         return {
             payload: authUser,
             accessToken: token,
