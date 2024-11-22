@@ -39,8 +39,8 @@ export class UserController {
     }
 
     @Post()
-    async createUser(@Body() { username, password, email }: CreateUserDto) {
-        return this.userService.create({ username, password, email })
+    async createUser(@Body() { username, password }: CreateUserDto) {
+        return this.userService.create({ username, password })
     }
 
     @Put("me/profile-pic")
@@ -64,7 +64,9 @@ export class UserController {
 
     @Get(":userId")
     async getById(@Param("userId", ParseIntPipe) userId: number) {
-        return this.userService.findById(userId)
+        const user = await this.userService.findById(userId)
+        console.log(user)
+        return user
     }
 
     @UseGuards(JwtAuthGuard)

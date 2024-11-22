@@ -61,7 +61,7 @@ export class Club extends AbstractEntity {
 
     @OneToMany(() => Playlist, (playlist) => playlist.club)
     @JoinColumn()
-    playlists: Playlist[]
+    playlists?: Playlist[]
 
     @AfterLoad()
     updateCounters() {

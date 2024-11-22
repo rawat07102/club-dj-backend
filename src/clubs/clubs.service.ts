@@ -34,9 +34,15 @@ export class ClubsService implements IClubService {
     ) {}
 
     async addPlaylistToClub(clubId: Club["id"], authUser: AuthUserPayload) {
-        const club = await this.clubRepo.findOneBy({ id: clubId })
+        const club = await this.clubRepo.findOne({
+            where: { id: clubId },
+            relations: {
+                playlists: true,
+            },
+        })
+        console.log(club.playlists)
         const newPlaylist = await this.playlistService.create(
-            `Playlist #${club.playlists.length + 1}`,
+            `Playlist #${(club.playlists.length || 0) + 1}`,
             authUser
         )
         await this.clubRepo
@@ -44,6 +50,7 @@ export class ClubsService implements IClubService {
             .relation(Club, "playlists")
             .of(clubId)
             .add(newPlaylist.id)
+        console.log(newPlaylist)
 
         return newPlaylist.id
     }

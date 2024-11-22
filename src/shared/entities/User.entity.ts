@@ -28,9 +28,6 @@ export class User extends AbstractEntity {
     profilePic?: string
 
     @Column()
-    email: string
-
-    @Column()
     @Exclude()
     password: string
 

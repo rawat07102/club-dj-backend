@@ -18,8 +18,7 @@ export class AuthService implements IAuthService {
 
     async validateUser(username: string, password: string) {
         const user = await this.userService.findByUsername(username)
-        const isValid =
-            !!user && (await bcrypt.compare(password, user.password))
+        const isValid = user && (await bcrypt.compare(password, user.password))
 
         return isValid ? user : null
     }

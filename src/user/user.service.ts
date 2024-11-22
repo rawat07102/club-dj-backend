@@ -87,14 +87,12 @@ export class UserService implements IUserService {
     async create({
         username,
         password,
-        email,
     }: CreateUserDto): Promise<User["id"]> {
         try {
             const passwordHash = await bcrypt.hash(password, 10)
             const user = this.userRepo.create({
                 username,
                 password: passwordHash,
-                email,
             })
             await user.save()
             return user.id
