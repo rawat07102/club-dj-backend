@@ -13,6 +13,7 @@ import { AuthUserPayload, Buckets, FindAllOptions } from "@/shared/utils/types"
 import { CreateUserDto } from "@/auth/dtos/CreateUser.dto"
 import { ImagesService } from "@/images.service"
 import * as path from "path"
+import { UpdateUserDto } from "@/auth/dtos/update-user.dto"
 
 @Injectable()
 export class UserService implements IUserService {
@@ -23,8 +24,20 @@ export class UserService implements IUserService {
         private imageService: ImagesService
     ) {}
 
-    private createFileName(id: User["id"], fileExtension: string) {
-        return `${id}-profile-pic${fileExtension}`
+    async updateUserDetails(id: User["id"], dto: UpdateUserDto): Promise<User> {
+        const { bio } = dto
+        const user = await this.userRepo.findOne({
+            where: {
+                id,
+            },
+        })
+
+        if (bio) {
+            user.bio = bio
+            await user.save()
+        }
+
+        return user
     }
 
     async changeProfilePic(
@@ -43,7 +56,10 @@ export class UserService implements IUserService {
         const imageUrl = await this.imageService.uploadFile(
             file,
             Buckets.USERS,
-            this.createFileName(user.id, path.extname(file.originalname))
+            this.imageService.createFileName(
+                user.id,
+                path.extname(file.originalname)
+            )
         )
         user.profilePic = imageUrl
         await user.save()
@@ -84,10 +100,7 @@ export class UserService implements IUserService {
             .remove(clubId)
     }
 
-    async create({
-        username,
-        password,
-    }: CreateUserDto): Promise<User["id"]> {
+    async create({ username, password }: CreateUserDto): Promise<User["id"]> {
         try {
             const passwordHash = await bcrypt.hash(password, 10)
             const user = this.userRepo.create({

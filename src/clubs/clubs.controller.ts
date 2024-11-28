@@ -16,14 +16,12 @@ import {
     UseGuards,
     UseInterceptors,
 } from "@nestjs/common"
-import { PostClubDto } from "./dtos/PostClub.dto"
 import { JwtAuthGuard } from "@/auth/utils/guards"
 import { AuthenticatedUser } from "@/shared/utils/decorators"
 import { AuthUserPayload } from "@/shared/utils/types"
 import { PatchClubDto } from "./dtos/PatchClub.dto"
 import { IClubService } from "./interfaces/IClubService.interface"
 import { IPlaylistService } from "@/playlists/interfaces/IPlaylistService.interface"
-import { CreatePlaylistDto } from "@/playlists/dtos/create-playlist.dto"
 import { FileInterceptor } from "@nestjs/platform-express"
 
 @Controller(Routes.CLUBS)
@@ -56,9 +54,7 @@ export class ClubsController {
 
     @Post()
     @UseGuards(JwtAuthGuard)
-    async create(
-        @AuthenticatedUser() authUser: AuthUserPayload
-    ) {
+    async create(@AuthenticatedUser() authUser: AuthUserPayload) {
         return this.clubService.create(authUser)
     }
 
@@ -113,6 +109,15 @@ export class ClubsController {
     }
 
     @UseGuards(JwtAuthGuard)
+    @Patch(":clubId/voteSkipCount")
+    async voteSkip(
+        @Param("clubId", ParseIntPipe) clubId: number,
+        @AuthenticatedUser() authUser: AuthUserPayload
+    ) {
+        return this.clubService.voteSkip(clubId, authUser)
+    }
+
+    @UseGuards(JwtAuthGuard)
     @Put(":clubId/followers")
     async addUserToClubFollowers(
         @Param("clubId", ParseIntPipe) clubId: number,
@@ -132,9 +137,7 @@ export class ClubsController {
 
     @UseGuards(JwtAuthGuard)
     @Get(":clubId/playlists")
-    async getPlaylists(
-        @Param("clubId", ParseIntPipe) clubId: number,
-    ) {
+    async getPlaylists(@Param("clubId", ParseIntPipe) clubId: number) {
         const club = await this.clubService.findById(clubId)
         return club.playlists
     }
@@ -143,7 +146,7 @@ export class ClubsController {
     @Post(":clubId/playlists")
     async createNewPlaylist(
         @Param("clubId", ParseIntPipe) clubId: number,
-        @AuthenticatedUser() authUser: AuthUserPayload,
+        @AuthenticatedUser() authUser: AuthUserPayload
     ) {
         if (!this.clubService.isCreator(clubId, authUser.id)) {
             throw new UnauthorizedException()

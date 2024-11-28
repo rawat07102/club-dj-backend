@@ -10,6 +10,7 @@ import { ImagesService } from "@/images.service"
 import { ClubsGateway } from "./clubs.gateway"
 import { AuthModule } from "@/auth/auth.module"
 import { GenresModule } from "@/genres/genres.module"
+import { YoutubeModule } from "@/youtube/youtube.module"
 
 @Module({
     imports: [
@@ -18,6 +19,7 @@ import { GenresModule } from "@/genres/genres.module"
         PlaylistsModule,
         AuthModule,
         GenresModule,
+        YoutubeModule,
     ],
     providers: [
         {

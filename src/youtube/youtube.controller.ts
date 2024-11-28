@@ -2,12 +2,16 @@ import { IConfiguration } from "@/shared/config/configuration.interface"
 import { Controller, Get, Inject, Param } from "@nestjs/common"
 import { ConfigService } from "@nestjs/config"
 import axios from "axios"
+import { YoutubeService } from "./youtube.service"
 
 @Controller("youtube")
 export class YoutubeController {
     constructor(
         @Inject()
-        private configService: ConfigService<IConfiguration, true>
+        private configService: ConfigService<IConfiguration, true>,
+
+        @Inject()
+        private youtubeService: YoutubeService
     ) {}
 
     @Get("videos/:videoId")
@@ -25,5 +29,10 @@ export class YoutubeController {
             },
         })
         return ytRes.data
+    }
+
+    @Get("videos/:videoId/duration")
+    async getVideoDuration(@Param("videoId") videoId: string) {
+        return this.youtubeService.getVideoDuration(videoId)
     }
 }

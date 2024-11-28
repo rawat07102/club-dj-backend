@@ -10,9 +10,11 @@ import { entities } from "./shared/entities"
 import { PlaylistsModule } from "./playlists/playlists.module"
 import { YoutubeModule } from './youtube/youtube.module';
 import { GenresModule } from './genres/genres.module';
+import { ScheduleModule } from "@nestjs/schedule"
 
 @Module({
     imports: [
+        ScheduleModule.forRoot(),
         ConfigModule.forRoot({
             isGlobal: true,
             load: [configuration],
@@ -24,7 +26,8 @@ import { GenresModule } from './genres/genres.module';
                 type: "postgres",
                 url: configService.get("database.url", { infer: true }),
                 entities: entities,
-                logging: process.env.NODE_ENV === "dev",
+                //logging: process.env.NODE_ENV === "dev",
+                logging: false,
                 synchronize: process.env.NODE_ENV === "dev",
             }),
             inject: [ConfigService],

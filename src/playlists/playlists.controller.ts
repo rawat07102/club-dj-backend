@@ -10,6 +10,7 @@ import {
     Inject,
     Param,
     ParseIntPipe,
+    Patch,
     Put,
     UnauthorizedException,
     UploadedFile,
@@ -18,6 +19,7 @@ import {
 } from "@nestjs/common"
 import { IPlaylistService } from "./interfaces/IPlaylistService.interface"
 import { FileInterceptor } from "@nestjs/platform-express"
+import { UpdatePlaylistDto } from "./dtos/update-playlist.dto"
 
 @Controller(Routes.PLAYLISTS)
 export class PlaylistsController {
@@ -49,6 +51,20 @@ export class PlaylistsController {
         return this.playlistService.changePlaylistThumbnail(
             playlistId,
             file,
+            authUser
+        )
+    }
+
+    @Patch(":playlistId")
+    @UseGuards(JwtAuthGuard)
+    async updatePlaylistDetails(
+        @Param("playlistId", ParseIntPipe) playlistId: number,
+        @Body() dto: UpdatePlaylistDto,
+        @AuthenticatedUser() authUser: AuthUserPayload
+    ) {
+        return this.playlistService.updatePlaylistDetails(
+            playlistId,
+            dto,
             authUser
         )
     }

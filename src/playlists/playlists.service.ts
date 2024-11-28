@@ -9,12 +9,10 @@ import {
 import { InjectRepository } from "@nestjs/typeorm"
 import { Repository } from "typeorm"
 import { IPlaylistService } from "./interfaces/IPlaylistService.interface"
-import { CreatePlaylistDto } from "./dtos/create-playlist.dto"
-import { Services } from "@/shared/constants"
-import { IUserService } from "@/user/interfaces/IUserService.interface"
 import { AuthUserPayload, Buckets } from "@/shared/utils/types"
 import { ImagesService } from "@/images.service"
-import path from "path"
+import * as path from "path"
+import { UpdatePlaylistDto } from "./dtos/update-playlist.dto"
 
 @Injectable()
 export class PlaylistsService implements IPlaylistService {
@@ -30,12 +28,9 @@ export class PlaylistsService implements IPlaylistService {
         return this.playlistRepo.find({})
     }
 
-    async create(
-        name: string,
-        authUser: AuthUserPayload
-    ): Promise<Playlist> {
+    async create(name: string, authUser: AuthUserPayload): Promise<Playlist> {
         const newPlaylist = this.playlistRepo.create({
-            name
+            name,
         })
 
         await this.playlistRepo
@@ -49,7 +44,46 @@ export class PlaylistsService implements IPlaylistService {
     }
 
     async findById(id: Playlist["id"]): Promise<Playlist> {
-        return this.playlistRepo.findOneBy({ id })
+        return this.playlistRepo.findOne({
+            where: { id },
+            relations: {
+                creator: true,
+            },
+            select: {
+                creator: {
+                    username: true,
+                    profilePic: true,
+                    bio: true,
+                },
+            },
+        })
+    }
+
+    async updatePlaylistDetails(
+        id: Playlist["id"],
+        dto: UpdatePlaylistDto,
+        authUser: AuthUserPayload
+    ): Promise<Playlist> {
+        const { name, description } = dto
+        const playlist = await this.playlistRepo.findOne({
+            relations: {
+                creator: true,
+            },
+            where: {
+                id,
+            },
+        })
+        if (!playlist || playlist.creator.id !== authUser.id) {
+            throw new UnauthorizedException("User is not authorized")
+        }
+        if (name) {
+            playlist.name = name
+        }
+        if (description) {
+            playlist.description = description
+        }
+        await playlist.save()
+        return playlist
     }
 
     async changePlaylistThumbnail(
@@ -59,7 +93,6 @@ export class PlaylistsService implements IPlaylistService {
     ): Promise<Club["thumbnail"]> {
         const playlist = await this.playlistRepo.findOneBy({
             id,
-
             creatorId: authUser.id,
         })
         if (!playlist) {

@@ -1,5 +1,6 @@
 import { Club, Playlist, User } from "@/shared/entities"
 import { AuthUserPayload } from "@/shared/utils/types"
+import { UpdatePlaylistDto } from "../dtos/update-playlist.dto"
 
 export interface IPlaylistService {
     findAll(): Promise<Playlist[]>
@@ -22,4 +23,9 @@ export interface IPlaylistService {
     ): Promise<void>
     delete(id: Playlist["id"]): Promise<void>
     isCreator(id: Playlist["id"], userId: User["id"]): Promise<boolean>
+    updatePlaylistDetails(
+        id: Playlist["id"],
+        dto: UpdatePlaylistDto,
+        authUser: AuthUserPayload
+    ): Promise<Playlist>
 }

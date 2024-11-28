@@ -13,7 +13,7 @@ import { AbstractEntity } from "./Abstract.entity"
 import { User } from "./User.entity"
 import { Playlist } from "./Playlist.entity"
 import { Genre } from "./Genre.entity"
-import { IsInt, IsString, IsUrl, Length, MaxLength } from "class-validator"
+import { IsString, IsUrl, Length, MaxLength } from "class-validator"
 
 @Entity()
 export class Club extends AbstractEntity {
@@ -33,9 +33,23 @@ export class Club extends AbstractEntity {
     @IsUrl()
     thumbnail: string
 
-    @IsString({ each: true })
-    @Column("simple-array")
-    queue: string[]
+    @Column("simple-array", { nullable: true })
+    queue: string[] | null
+
+    @Column({ default: 0 })
+    timeBeforeNextQueue: number
+
+    @Column({ nullable: true })
+    currentVideo: string | null
+
+    @Column({ nullable: true })
+    currentVideoStartTime: Date | null
+
+    @Column({ default: 0 })
+    voteSkipCount: number
+
+    @Column("simple-array", { nullable: true })
+    votes: string[] | null
 
     @ManyToMany(() => Genre)
     @JoinTable()

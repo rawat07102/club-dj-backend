@@ -24,8 +24,8 @@ export class User extends AbstractEntity {
     })
     bio: string
 
-    @Column({nullable: true})
-    profilePic?: string
+    @Column({ nullable: true })
+    profilePic: string | null
 
     @Column()
     @Exclude()
@@ -35,6 +35,9 @@ export class User extends AbstractEntity {
         default: 0,
     })
     stars: number
+
+    @Column({ nullable: true })
+    lastQueued: Date | null
 
     @ManyToMany(() => User, (user) => user.friends)
     @JoinTable()
@@ -49,7 +52,7 @@ export class User extends AbstractEntity {
     //sharedPlaylists: Playlist[]
 
     @OneToMany(() => Club, (club) => club.creator, {
-        cascade: ["insert"]
+        cascade: ["insert"],
     })
     @JoinColumn()
     clubs: Club[]

@@ -1,10 +1,18 @@
 import { CreateUserDto } from "@/auth/dtos/CreateUser.dto"
+import { UpdateUserDto } from "@/auth/dtos/update-user.dto"
 import { Club, User } from "@/shared/entities"
 import { AuthUserPayload, FindAllOptions } from "@/shared/utils/types"
 
 export interface IUserService {
     create(dto: CreateUserDto): Promise<User["id"]>
-    changeProfilePic(file: Express.Multer.File, authUser: AuthUserPayload): Promise<User["profilePic"]>
+    updateUserDetails(
+        id: User["id"],
+        dto: UpdateUserDto,
+    ): Promise<User>
+    changeProfilePic(
+        file: Express.Multer.File,
+        authUser: AuthUserPayload
+    ): Promise<User["profilePic"]>
     deleteProfilePic(id: User["id"]): Promise<void>
     addClubToUserFollow(
         id: User["id"],

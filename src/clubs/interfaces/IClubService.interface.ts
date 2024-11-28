@@ -1,6 +1,7 @@
 import { Club, Playlist, User } from "@/shared/entities"
 import { AuthUserPayload, FindAllOptions } from "@/shared/utils/types"
 import { PatchClubDto } from "../dtos/PatchClub.dto"
+import { PlayerPayload } from "../dtos/player-payload"
 
 export interface IClubService {
     updateClubDetails(
@@ -60,4 +61,10 @@ export interface IClubService {
         clubId: Club["id"],
         playlistId: Playlist["id"]
     ): Promise<void>
+    playNextVideo(id: Club["id"]): Promise<PlayerPayload>
+    getPlayerPayload(id: Club["id"]): Promise<PlayerPayload>
+    voteSkip(
+        id: Club["id"],
+        authUser: AuthUserPayload
+    ): Promise<Club["voteSkipCount"]>
 }
