@@ -31,35 +31,16 @@ export class User extends AbstractEntity {
     @Exclude()
     password: string
 
-    @Column({
-        default: 0,
-    })
-    stars: number
-
     @Column({ nullable: true })
     lastQueued: Date | null
-
-    @ManyToMany(() => User, (user) => user.friends)
-    @JoinTable()
-    friends: User[]
 
     @OneToMany(() => Playlist, (playlist) => playlist.creator)
     @JoinColumn()
     playlists: Playlist[]
-
-    //@JoinTable()
-    //@ManyToMany(() => Playlist, (playlist) => playlist.sharedWith)
-    //sharedPlaylists: Playlist[]
 
     @OneToMany(() => Club, (club) => club.creator, {
         cascade: ["insert"],
     })
     @JoinColumn()
     clubs: Club[]
-
-    @ManyToOne(() => Club, (club) => club.djWishlist)
-    wishlistJoined: Club
-
-    @ManyToMany(() => Club, (club) => club.followers)
-    clubsFollowed: Club[]
 }

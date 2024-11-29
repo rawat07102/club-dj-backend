@@ -118,24 +118,6 @@ export class ClubsController {
     }
 
     @UseGuards(JwtAuthGuard)
-    @Put(":clubId/followers")
-    async addUserToClubFollowers(
-        @Param("clubId", ParseIntPipe) clubId: number,
-        @AuthenticatedUser() authUser: AuthUserPayload
-    ) {
-        return this.clubService.addUserToClubFollowers(clubId, authUser.id)
-    }
-
-    @UseGuards(JwtAuthGuard)
-    @Delete(":clubId/followers")
-    async removeUserFromClubFollowers(
-        @Param("clubId", ParseIntPipe) clubId: number,
-        @AuthenticatedUser() authUser: AuthUserPayload
-    ) {
-        return this.clubService.removeUserFromClubFollowers(clubId, authUser.id)
-    }
-
-    @UseGuards(JwtAuthGuard)
     @Get(":clubId/playlists")
     async getPlaylists(@Param("clubId", ParseIntPipe) clubId: number) {
         const club = await this.clubService.findById(clubId)

@@ -29,26 +29,6 @@ export interface IClubService {
         videoId: string,
         authUser: AuthUserPayload
     ): Promise<Club>
-    addUserToDjWishlist(
-        id: Club["id"],
-        userId: User["id"],
-        authUser: AuthUserPayload
-    ): Promise<Club["djWishlist"]>
-    removeUserFromDjWishlist(
-        id: Club["id"],
-        userId: User["id"],
-        authUser: AuthUserPayload
-    ): Promise<Club["djWishlist"]>
-    setCurrentDj(
-        id: Club["id"],
-        userId: User["id"],
-        authUser: AuthUserPayload
-    ): Promise<Club["currentDJ"]>
-    addUserToClubFollowers(id: Club["id"], userId: User["id"]): Promise<void>
-    removeUserFromClubFollowers(
-        id: Club["id"],
-        userId: User["id"]
-    ): Promise<void>
     findAll(options: FindAllOptions): Promise<Club[]>
     findById(id: Club["id"]): Promise<Club>
     delete(id: Club["id"], authUser: AuthUserPayload): Promise<boolean>

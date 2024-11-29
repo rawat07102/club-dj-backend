@@ -135,12 +135,8 @@ export class UserService implements IUserService {
                 id,
             },
             relations: {
-                friends: true,
                 playlists: true,
                 clubs: true,
-                clubsFollowed: true,
-                //sharedPlaylists: true,
-                wishlistJoined: true,
             },
         })
     }

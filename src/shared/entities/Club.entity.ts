@@ -55,30 +55,12 @@ export class Club extends AbstractEntity {
     @JoinTable()
     genres: Genre[]
 
-    @OneToOne(() => User, { nullable: true })
-    @JoinColumn()
-    currentDJ: User
-
-    @OneToMany(() => User, (user) => user.wishlistJoined)
-    @JoinColumn()
-    djWishlist: User[]
-
     @ManyToOne(() => User, (creator) => creator.clubs)
     creator: User
     @Column()
     creatorId: number
 
-    @ManyToMany(() => User, (user) => user.clubsFollowed)
-    @JoinTable()
-    followers: User[]
-    followersCount: number
-
     @OneToMany(() => Playlist, (playlist) => playlist.club)
     @JoinColumn()
     playlists?: Playlist[]
-
-    @AfterLoad()
-    updateCounters() {
-        this.followersCount = this.followers?.length || 0
-    }
 }

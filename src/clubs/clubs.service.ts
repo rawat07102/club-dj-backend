@@ -122,28 +122,6 @@ export class ClubsService implements IClubService {
         await club.save()
     }
 
-    async addUserToClubFollowers(
-        id: Club["id"],
-        userId: User["id"]
-    ): Promise<void> {
-        return this.clubRepo
-            .createQueryBuilder()
-            .relation(Club, "followers")
-            .of(id)
-            .add(userId)
-    }
-
-    removeUserFromClubFollowers(
-        id: Club["id"],
-        userId: User["id"]
-    ): Promise<void> {
-        return this.clubRepo
-            .createQueryBuilder()
-            .relation(Club, "followers")
-            .of(id)
-            .remove(userId)
-    }
-
     async addVideoToQueue(
         id: Club["id"],
         videoId: string,
@@ -219,50 +197,6 @@ export class ClubsService implements IClubService {
         return club
     }
 
-    async addUserToDjWishlist(
-        id: Club["id"],
-        userId: User["id"],
-        authUser: AuthUserPayload
-    ): Promise<Club["djWishlist"]> {
-        const club = await this.clubRepo.findOneByOrFail({ id })
-        if (club.creator.id !== authUser.id) {
-            throw new UnauthorizedException(
-                "Only club owner can make changes to the djWishlist."
-            )
-        }
-        const user = await this.userService.findById(userId)
-        club.djWishlist.push(user)
-        await club.save()
-        return club.djWishlist
-    }
-
-    async removeUserFromDjWishlist(
-        id: Club["id"],
-        userId: User["id"],
-        authUser: AuthUserPayload
-    ): Promise<Club["djWishlist"]> {
-        const club = await this.clubRepo.findOneByOrFail({ id })
-        if (club.creator.id !== authUser.id) {
-            throw new UnauthorizedException(
-                "Only club owner can make changes to the djWishlist."
-            )
-        }
-        club.djWishlist = club.djWishlist.filter(({ id }) => id !== userId)
-        await club.save()
-        return club.djWishlist
-    }
-
-    async setCurrentDj(
-        id: Club["id"],
-        userId: User["id"]
-    ): Promise<Club["currentDJ"]> {
-        const club = await this.clubRepo.findOneByOrFail({ id })
-        const user = await this.userService.findById(userId)
-        club.currentDJ = user
-        await club.save()
-        return club.currentDJ
-    }
-
     async create(authUser: AuthUserPayload): Promise<Club["id"]> {
         const user = await this.userService.findById(authUser.id)
         const newClub = this.clubRepo.create({
@@ -303,10 +237,7 @@ export class ClubsService implements IClubService {
             },
             relations: {
                 creator: true,
-                currentDJ: true,
-                followers: true,
                 playlists: true,
-                djWishlist: true,
                 genres: true,
             },
         })

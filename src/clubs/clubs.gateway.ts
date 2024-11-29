@@ -13,7 +13,6 @@ import {
 import { Server, Socket } from "socket.io"
 import { Club } from "@/shared/entities"
 import { PlayerPayload } from "./dtos/player-payload"
-import { instanceToPlain } from "class-transformer"
 import { IClubService } from "./interfaces/IClubService.interface"
 
 type SocketWithAuth = Socket<

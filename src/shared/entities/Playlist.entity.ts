@@ -19,9 +19,6 @@ export class Playlist extends AbstractEntity {
     @Column({ nullable: true })
     thumbnail?: string
 
-    @Column({ default: 0 })
-    likeCount: number
-
     @ManyToOne(() => User, (user) => user.playlists)
     creator: User
     @Column()
